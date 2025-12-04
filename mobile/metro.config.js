@@ -7,4 +7,16 @@ const config = getDefaultConfig(__dirname, {
 	isCSSEnabled: true,
 });
 
+config.watchFolders = [
+	// Allow Metro to watch workspace root and shared packages
+	require("path").join(__dirname, "../shared"),
+];
+
+/*
+config.resolver.nodeModulesPaths = [
+  require('path').join(__dirname, 'node_modules'),
+  require('path').join(__dirname, '../../node_modules'),
+];
+*/
+
 module.exports = config;
