@@ -1,0 +1,23 @@
+{
+	"name": "lifestreams-prototype",
+	"version": "1.0.0",
+	"homepage": "https://github.com/bigaru/lifestreams-prototype#readme",
+	"bugs": {
+		"url": "https://github.com/bigaru/lifestreams-prototype/issues"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/bigaru/lifestreams-prototype.git"
+	},
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"workspaces": [
+		"mobile",
+		"shared",
+		"web"
+	],
+	"devDependencies": {
+		"prettier": "^3.7.3"
+	}
+}

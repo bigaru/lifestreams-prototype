@@ -12,11 +12,9 @@ config.watchFolders = [
 	require("path").join(__dirname, "../shared"),
 ];
 
-/*
 config.resolver.nodeModulesPaths = [
-  require('path').join(__dirname, 'node_modules'),
-  require('path').join(__dirname, '../../node_modules'),
+	require("path").join(__dirname, "node_modules"),
+	require("path").join(__dirname, "../node_modules"),
 ];
-*/
 
 module.exports = config;

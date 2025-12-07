@@ -8,11 +8,6 @@
 		"types": ["vite/client"],
 		"skipLibCheck": true,
 
-		"baseUrl": ".",
-		"paths": {
-			"@lifestreams/shared": ["../shared/src"]
-		},
-
 		/* Bundler mode */
 		"moduleResolution": "bundler",
 		"allowImportingTsExtensions": true,
