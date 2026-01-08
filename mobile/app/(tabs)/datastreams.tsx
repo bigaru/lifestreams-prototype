@@ -36,7 +36,7 @@ export default function () {
 					<Card key={item.id} backgroundColor="white" bordered padding="$4" pb="$3" pt="$3" margin="$-1" borderRadius="$radius.2">
 						<YStack flex={1} gap="$3">
 							<XStack gap="$1" justify="space-between">
-								<XStack gap="$1" alignItems="center">
+								<XStack gap="$1" items="center">
 									{item.icon}
 									<Heading size="$5" color="$black1">
 										{item.title}
@@ -57,7 +57,3 @@ export default function () {
 		</ScrollView>
 	)
 }
-
-/*
-
-*/
