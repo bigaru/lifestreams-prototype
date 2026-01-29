@@ -1,11 +1,10 @@
 import { Tabs } from 'expo-router'
 import React from 'react'
-
+import MaterialIcons from '@expo/vector-icons/MaterialIcons'
 import { HapticTab } from '@/components/haptic-tab'
 import { IconSymbol } from '@/components/ui/icon-symbol'
 import { Colors } from '@/constants/theme'
 import { useColorScheme } from '@/hooks/use-color-scheme'
-import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 
 export default function TabLayout() {
 	const colorScheme = useColorScheme()
@@ -18,25 +17,13 @@ export default function TabLayout() {
 				tabBarButton: HapticTab,
 			}}
 		>
+			<Tabs.Screen name="index" options={{ title: 'Home', tabBarIcon: ({ color }) => <MaterialIcons color={color} size={28} name="home" /> }} />
+			<Tabs.Screen name="following" options={{ title: 'Following', tabBarIcon: ({ color }) => <MaterialIcons color={color} size={28} name="groups" /> }} />
 			<Tabs.Screen
-				name="index"
+				name="reporting"
 				options={{
-					title: 'Home',
-					tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
-				}}
-			/>
-			<Tabs.Screen
-				name="explore"
-				options={{
-					title: 'Explore',
-					tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
-				}}
-			/>
-			<Tabs.Screen
-				name="datastreams"
-				options={{
-					title: 'Data Streams',
-					tabBarIcon: ({ color }) => <MaterialCommunityIcons name="account-box" size={28} color={color} />,
+					title: 'Self-Reporting',
+					tabBarIcon: ({ color }) => <MaterialIcons color={color} size={28} name="fact-check" />,
 				}}
 			/>
 		</Tabs>

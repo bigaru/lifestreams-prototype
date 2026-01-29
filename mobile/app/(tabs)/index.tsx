@@ -1,82 +1,66 @@
-import { Image } from 'expo-image'
-import { Platform, StyleSheet } from 'react-native'
-import { Button } from 'tamagui'
+import Entypo from '@expo/vector-icons/Entypo'
+import { Activity, Bed, Flame, Footprints, Heart, Scale, Users, EllipsisVertical } from '@tamagui/lucide-icons'
+import { Button, Card, H3, Heading, Paragraph, ScrollView, XStack, YStack } from 'tamagui'
 
-import { HelloWave } from '@/components/hello-wave'
-import ParallaxScrollView from '@/components/parallax-scroll-view'
-import { ThemedText } from '@/components/themed-text'
-import { ThemedView } from '@/components/themed-view'
-import { Link } from 'expo-router'
-import { foo } from '@lifestreams/shared'
-
-export default function HomeScreen() {
-	return (
-		<ParallaxScrollView
-			headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-			headerImage={<Image source={require('@/assets/images/partial-react-logo.png')} style={styles.reactLogo} />}
-		>
-			<ThemedView style={styles.titleContainer}>
-				<ThemedText type="title">Welcome {foo}</ThemedText>
-				<Button theme="blue">Hello world</Button>
-			</ThemedView>
-			<ThemedView style={styles.stepContainer}>
-				<ThemedText type="subtitle">Step 1: Try it</ThemedText>
-				<ThemedText>
-					Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes. Press{' '}
-					<ThemedText type="defaultSemiBold">
-						{Platform.select({
-							ios: 'cmd + d',
-							android: 'cmd + m',
-							web: 'F12',
-						})}
-					</ThemedText>{' '}
-					to open developer tools.
-				</ThemedText>
-			</ThemedView>
-			<ThemedView style={styles.stepContainer}>
-				<Link href="/modal">
-					<Link.Trigger>
-						<ThemedText type="subtitle">Step 2: Explore</ThemedText>
-					</Link.Trigger>
-					<Link.Preview />
-					<Link.Menu>
-						<Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-						<Link.MenuAction title="Share" icon="square.and.arrow.up" onPress={() => alert('Share pressed')} />
-						<Link.Menu title="More" icon="ellipsis">
-							<Link.MenuAction title="Delete" icon="trash" destructive onPress={() => alert('Delete pressed')} />
-						</Link.Menu>
-					</Link.Menu>
-				</Link>
-
-				<ThemedText>{`Tap the Explore tab to learn more about what's included in this starter app.`}</ThemedText>
-			</ThemedView>
-			<ThemedView style={styles.stepContainer}>
-				<ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-				<ThemedText>
-					{`When you're ready, run `}
-					<ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh <ThemedText type="defaultSemiBold">app</ThemedText> directory.
-					This will move the current <ThemedText type="defaultSemiBold">app</ThemedText> to <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-				</ThemedText>
-			</ThemedView>
-		</ParallaxScrollView>
-	)
+function dateInPast(removeDays: number = 0) {
+	const d = new Date()
+	d.setDate(d.getDate() - removeDays)
+	return d.toISOString()
 }
 
-const styles = StyleSheet.create({
-	titleContainer: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		gap: 8,
-	},
-	stepContainer: {
-		gap: 8,
-		marginBottom: 8,
-	},
-	reactLogo: {
-		height: 178,
-		width: 290,
-		bottom: 0,
-		left: 0,
-		position: 'absolute',
-	},
-})
+const formatOpt: Intl.DateTimeFormatOptions = {
+	weekday: 'short', // Mon
+	day: '2-digit', // 12
+	month: 'short', // Jan
+}
+
+const data = [
+	{ id: '1', val: '65', unit: 'bpm', title: 'Heart Rate', categories: ['Health', 'Heart'], last: dateInPast(30), icon: <Heart size="$1" mr="$2" /> },
+	{ id: '2', val: "6'103", unit: '', title: 'Step Count', categories: ['Health', 'Movement'], last: dateInPast(), icon: <Footprints size="$1" mr="$2" /> },
+	{ id: '3', val: '6', unit: 'h', title: 'Sleep', categories: ['Health', 'Sleep'], last: dateInPast(2), icon: <Bed size="$1" mr="$2" /> },
+	{ id: '4', val: '65', unit: 'bpm', title: 'ECG', categories: ['Health', 'Heart'], last: dateInPast(5), icon: <Activity size="$1" mr="$2" /> },
+	{ id: '5', val: "2'251", unit: 'kcal', title: 'Calories Burned', categories: ['Health'], last: dateInPast(60), icon: <Flame size="$1" mr="$2" /> },
+	{ id: '6', val: '80', unit: 'kg', title: 'Body Weight', categories: ['Health'], last: dateInPast(180), icon: <Scale size="$1" mr="$2" /> },
+	{ id: '7', val: '2.4', unit: 'h', title: 'Social Activity', categories: ['Social'], last: dateInPast(14), icon: <Users size="$1" mr="$2" /> },
+]
+
+export default function () {
+	return (
+		<ScrollView>
+			<XStack p="$3" pt="$7">
+				<H3 size="$6" fontWeight="800">
+					My Data Streams
+				</H3>
+			</XStack>
+			<YStack gap="$3" p="$3" pt="$0">
+				{data.map((item, idx) => (
+					<Card key={idx} backgroundColor="white" bordered padding="$4" pb="$3" pt="$3" margin="$-1" borderRadius="$radius.6">
+						<YStack flex={1} gap="$1">
+							<XStack gap="$1" justify="space-between">
+								<XStack gap="$1" items="center">
+									{item.icon}
+									<Paragraph>{item.title}</Paragraph>
+								</XStack>
+								<Button size="$1" chromeless>
+									<EllipsisVertical size="$1" />
+								</Button>
+							</XStack>
+							<XStack gap="$1" justify="flex-start" items="baseline">
+								<Paragraph size="$8" fontWeight="800">
+									{item.val}
+								</Paragraph>
+								<Paragraph size="$5" fontWeight="800">
+									{item.unit}
+								</Paragraph>
+							</XStack>
+							<XStack gap="$1" justify="space-between">
+								<Paragraph>{item.categories.join(', ')}</Paragraph>
+								<Paragraph>{new Date(item.last).toLocaleDateString('de-CH', formatOpt)}</Paragraph>
+							</XStack>
+						</YStack>
+					</Card>
+				))}
+			</YStack>
+		</ScrollView>
+	)
+}
