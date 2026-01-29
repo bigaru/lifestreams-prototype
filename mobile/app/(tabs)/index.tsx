@@ -22,12 +22,19 @@ const data = [
 	{ id: '5', val: "2'251", unit: 'kcal', title: 'Calories Burned', categories: ['Health'], last: dateInPast(60), icon: <Flame size="$1" mr="$2" /> },
 	{ id: '6', val: '80', unit: 'kg', title: 'Body Weight', categories: ['Health'], last: dateInPast(180), icon: <Scale size="$1" mr="$2" /> },
 	{ id: '7', val: '2.4', unit: 'h', title: 'Social Activity', categories: ['Social'], last: dateInPast(14), icon: <Users size="$1" mr="$2" /> },
+	{ id: '1', val: '77', unit: 'bpm', title: 'Heart Rate', categories: ['Health', 'Heart'], last: dateInPast(30), icon: <Heart size="$1" mr="$2" /> },
+	{ id: '2', val: "3'103", unit: '', title: 'Step Count', categories: ['Health', 'Movement'], last: dateInPast(), icon: <Footprints size="$1" mr="$2" /> },
+	{ id: '3', val: '8', unit: 'h', title: 'Sleep', categories: ['Health', 'Sleep'], last: dateInPast(2), icon: <Bed size="$1" mr="$2" /> },
+	{ id: '4', val: '78', unit: 'bpm', title: 'ECG', categories: ['Health', 'Heart'], last: dateInPast(5), icon: <Activity size="$1" mr="$2" /> },
+	{ id: '5', val: "2'551", unit: 'kcal', title: 'Calories Burned', categories: ['Health'], last: dateInPast(60), icon: <Flame size="$1" mr="$2" /> },
+	{ id: '6', val: '70', unit: 'kg', title: 'Body Weight', categories: ['Health'], last: dateInPast(180), icon: <Scale size="$1" mr="$2" /> },
+	{ id: '7', val: '1.4', unit: 'h', title: 'Social Activity', categories: ['Social'], last: dateInPast(14), icon: <Users size="$1" mr="$2" /> },
 ]
 
 export default function () {
 	return (
 		<ScrollView>
-			<XStack p="$3" pt="$7">
+			<XStack p="$3">
 				<H3 size="$6" fontWeight="800">
 					My Data Streams
 				</H3>

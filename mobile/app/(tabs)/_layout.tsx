@@ -5,6 +5,7 @@ import { HapticTab } from '@/components/haptic-tab'
 import { IconSymbol } from '@/components/ui/icon-symbol'
 import { Colors } from '@/constants/theme'
 import { useColorScheme } from '@/hooks/use-color-scheme'
+import { UserCircle2 } from '@tamagui/lucide-icons'
 
 export default function TabLayout() {
 	const colorScheme = useColorScheme()
@@ -13,18 +14,15 @@ export default function TabLayout() {
 		<Tabs
 			screenOptions={{
 				tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-				headerShown: false,
 				tabBarButton: HapticTab,
+				headerLeft: () => <UserCircle2 size="$2.5" m="$4" strokeWidth={1} />,
 			}}
 		>
 			<Tabs.Screen name="index" options={{ title: 'Home', tabBarIcon: ({ color }) => <MaterialIcons color={color} size={28} name="home" /> }} />
 			<Tabs.Screen name="following" options={{ title: 'Following', tabBarIcon: ({ color }) => <MaterialIcons color={color} size={28} name="groups" /> }} />
 			<Tabs.Screen
 				name="reporting"
-				options={{
-					title: 'Self-Reporting',
-					tabBarIcon: ({ color }) => <MaterialIcons color={color} size={28} name="fact-check" />,
-				}}
+				options={{ title: 'Self-Reporting', tabBarIcon: ({ color }) => <MaterialIcons color={color} size={28} name="fact-check" /> }}
 			/>
 		</Tabs>
 	)
