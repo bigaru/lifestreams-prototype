@@ -1,0 +1,21 @@
+services:
+  db:
+    image: postgres:18
+    container_name: pg-dev
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: lifestreams_db
+    ports:
+      - 5432:5432
+    volumes:
+      - pgdata:/var/lib/postgresql
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 9000:8080
+
+volumes:
+  pgdata:
