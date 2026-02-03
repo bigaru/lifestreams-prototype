@@ -5,7 +5,7 @@ Run app
 ```bash
 docker compose -f ./docker-compose-dev.yml up -d
 
-./gradlew bootRun
+SPRING_PROFILES_ACTIVE=dev ./gradlew bootRun
 ```
 
 for backend `http://localhost:8080`
