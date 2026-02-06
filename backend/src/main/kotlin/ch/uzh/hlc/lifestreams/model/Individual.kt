@@ -4,18 +4,17 @@ import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Table
 import org.springframework.stereotype.Repository
 import org.springframework.data.repository.kotlin.CoroutineCrudRepository
-import java.time.Instant
+import java.util.UUID
 
 @JvmInline
-value class DatastreamId(private val v: Long)
+value class IndividualId(private val v: UUID)
 
-@Table("datastreams")
-data class Datastream(
-	@Id val id: DatastreamId?,
-	val IndividualCategoryId: Long,
-	val timestamp: Instant,
-	val value: Double,
+@Table("individuals")
+data class Individual(
+	@Id val id: IndividualId?,
+	val description: String,
+	val unit: String,
 )
 
 @Repository
-interface DatastreamRepository : CoroutineCrudRepository<Datastream, Long>
+interface IndividualRepository : CoroutineCrudRepository<Individual, Long>
