@@ -6,12 +6,9 @@ import org.springframework.stereotype.Repository
 import org.springframework.data.repository.kotlin.CoroutineCrudRepository
 
 
-@JvmInline
-value class CategoryId(private val v: Long)
-
 @Table("categories")
 data class Category(
-	@Id val id: CategoryId?,
+	@Id val id: Long?,
 	val description: String,
 )
 
@@ -22,7 +19,7 @@ interface CategoryRepository : CoroutineCrudRepository<Category, Long>
 @Table("individual_categories")
 data class IndividualCategory(
 	@Id val id: Long?,
-	val CategoryId: CategoryId,
+	val categoryId: Long,
 	val unit: String,
 	val deviceId: Long,
 )

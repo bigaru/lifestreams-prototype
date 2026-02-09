@@ -6,15 +6,13 @@ import org.springframework.stereotype.Repository
 import org.springframework.data.repository.kotlin.CoroutineCrudRepository
 import java.time.Instant
 
-@JvmInline
-value class DatastreamId(private val v: Long)
 
 @Table("datastreams")
 data class Datastream(
-	@Id val id: DatastreamId?,
-	val IndividualCategoryId: Long,
-	val timestamp: Instant,
-	val value: Double,
+	@Id val id: Long?,
+	val individualCategoryId: Long?,
+	val createdAt: Instant?,
+	val value: Double?,
 )
 
 @Repository

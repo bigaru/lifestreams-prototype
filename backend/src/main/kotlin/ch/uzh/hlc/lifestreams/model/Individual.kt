@@ -6,14 +6,11 @@ import org.springframework.stereotype.Repository
 import org.springframework.data.repository.kotlin.CoroutineCrudRepository
 import java.util.UUID
 
-@JvmInline
-value class IndividualId(private val v: UUID)
-
 @Table("individuals")
 data class Individual(
-	@Id val id: IndividualId?,
-	val description: String,
-	val unit: String,
+	@Id val id: UUID?,
+	val email: String,
+	val password: String,
 )
 
 @Repository
