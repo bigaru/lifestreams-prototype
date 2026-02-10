@@ -1,6 +1,6 @@
 package ch.uzh.hlc.lifestreams
 
-import ch.uzh.hlc.lifestreams.model.Datastream
+import ch.uzh.hlc.lifestreams.model.DatastreamDTO
 import ch.uzh.hlc.lifestreams.model.DatastreamRepository
 import kotlinx.coroutines.flow.Flow
 import org.slf4j.Logger
@@ -26,9 +26,8 @@ class TestController(
 	fun index(): Mono<String> = Mono.just("Hello  ${this.name}")
 
 	@GetMapping("/test")
-	fun test(): Flow<Datastream> {
+	fun test(): Flow<DatastreamDTO> {
 		return repository.findAll()
 	}
-
 
 }
