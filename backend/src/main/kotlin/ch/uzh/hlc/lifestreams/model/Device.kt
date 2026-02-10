@@ -1,10 +1,11 @@
 package ch.uzh.hlc.lifestreams.model
 
+import kotlinx.coroutines.flow.Flow
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Table
-import org.springframework.stereotype.Repository
 import org.springframework.data.repository.kotlin.CoroutineCrudRepository
-import java.util.UUID
+import org.springframework.stereotype.Repository
+import java.util.*
 
 @Table("individual_devices")
 data class IndividualDevice(
@@ -16,4 +17,6 @@ data class IndividualDevice(
 
 
 @Repository
-interface IndividualDeviceRepository : CoroutineCrudRepository<IndividualDevice, Long>
+interface IndividualDeviceRepository : CoroutineCrudRepository<IndividualDevice, Long> {
+	fun findAllByIndividualId(individualId: UUID): Flow<IndividualDevice>
+}

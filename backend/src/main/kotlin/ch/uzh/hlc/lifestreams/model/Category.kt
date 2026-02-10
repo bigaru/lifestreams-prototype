@@ -1,9 +1,10 @@
 package ch.uzh.hlc.lifestreams.model
 
+import kotlinx.coroutines.flow.Flow
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Table
-import org.springframework.stereotype.Repository
 import org.springframework.data.repository.kotlin.CoroutineCrudRepository
+import org.springframework.stereotype.Repository
 
 
 @Table("categories")
@@ -25,4 +26,6 @@ data class IndividualCategory(
 )
 
 @Repository
-interface IndividualCategoryRepository : CoroutineCrudRepository<IndividualCategory, Long>
+interface IndividualCategoryRepository : CoroutineCrudRepository<IndividualCategory, Long> {
+	fun findAllByDeviceId(deviceId: Long): Flow<IndividualCategory>
+}
