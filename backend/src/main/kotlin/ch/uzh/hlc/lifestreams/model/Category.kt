@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository
 data class Category(
 	@Id val id: Long?,
 	val description: String,
+	val classes: List<String>,
 )
 
 @Repository
@@ -25,4 +26,4 @@ data class IndividualCategory(
 )
 
 @Repository
-interface IndividualCategoryRepository : CoroutineCrudRepository<IndividualCategory, Long> 
+interface IndividualCategoryRepository : CoroutineCrudRepository<IndividualCategory, Long>

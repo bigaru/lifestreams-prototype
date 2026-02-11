@@ -10,7 +10,7 @@ function getBaseUrl() {
 
 const BASE_URL = process.env.EXPO_PUBLIC_API_URL || getBaseUrl()
 
-export async function apiFetch(path: string, options: RequestInit = {}) {
+async function apiFetch(path: string, options: RequestInit = {}) {
 	const url = path.startsWith('http') ? path : `${BASE_URL}/${path}`
 
 	const res = await fetch(url, {
@@ -29,3 +29,9 @@ export async function apiFetch(path: string, options: RequestInit = {}) {
 	const contentType = res.headers.get('content-type') || ''
 	return contentType.includes('application/json') ? res.json() : res.text()
 }
+
+async function getOverview() {
+	return apiFetch('api/v1/datastreams/overview/d5412a03-1f23-4507-ace2-d9a342d41c93')
+}
+
+export { apiFetch, getOverview }
