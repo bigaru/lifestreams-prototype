@@ -1,0 +1,24 @@
+services:
+  db:
+    image: postgres:18
+    container_name: pginstance
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: lifestreams_db
+    ports:
+      - 5432:5432
+    volumes:
+      - pgdata:/var/lib/postgresql
+      - ./db/init:/docker-entrypoint-initdb.d
+
+  backend:
+    image: ghcr.io/bigaru/lifestreams-prototype:0.0.1
+    container_name: spring
+    environment:
+      POSTGRES_USER: postgres
+    ports:
+      - 9000:8080
+
+volumes:
+  pgdata:
