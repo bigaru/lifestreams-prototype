@@ -1,7 +1,7 @@
 package ch.uzh.hlc.lifestreams
 
-import ch.uzh.hlc.lifestreams.model.DatastreamDTO
-import ch.uzh.hlc.lifestreams.model.DatastreamRepository
+import ch.uzh.hlc.lifestreams.model.DatastreamOverview
+import ch.uzh.hlc.lifestreams.model.DatastreamOverviewRepository
 import kotlinx.coroutines.flow.Flow
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -18,7 +18,7 @@ import java.util.*
 @RequestMapping("/api/v1/datastreams")
 class DatastreamController(
 	@Value($$"${spring.application.name}") val appName: String,
-	private val repo: DatastreamRepository,
+	private val repo: DatastreamOverviewRepository,
 ) {
 	companion object {
 		val log: Logger = LoggerFactory.getLogger(DatastreamController::class.java)
@@ -29,7 +29,7 @@ class DatastreamController(
 
 	// @TODO retrieve individualId from auth
 	@GetMapping("/overview/{individualId}")
-	fun overview(@PathVariable("individualId") individualId: UUID): Flow<DatastreamDTO> {
+	fun overview(@PathVariable("individualId") individualId: UUID): Flow<DatastreamOverview> {
 		return repo.findAllByIndividualId(individualId)
 	}
 }

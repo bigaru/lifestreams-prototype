@@ -47,3 +47,13 @@ CREATE INDEX IF NOT EXISTS idx_individual_categories_category_id ON individual_c
 CREATE INDEX IF NOT EXISTS idx_individual_categories_device_id ON individual_categories(device_id);
 
 CREATE INDEX IF NOT EXISTS idx_datastreams_individual_category_id ON datastreams(individual_category_id);
+
+-- Views
+DROP VIEW IF EXISTS datastream_overview;
+CREATE VIEW datastream_overview AS
+	SELECT DISTINCT ON (icat.id) ds.id, ds.created_at, ds.value, cat.id AS category_id, cat.description AS category_description, cat.classes, icat.unit,  idev.individual_id, idev.manufacturer, idev.model
+	FROM datastreams ds
+	LEFT JOIN individual_categories icat ON ds.individual_category_id = icat.id
+	LEFT JOIN categories cat ON icat.category_id = cat.id
+	LEFT JOIN individual_devices idev ON icat.device_id = idev.id
+	ORDER BY icat.id, ds.created_at DESC;
