@@ -1,4 +1,5 @@
 import * as API from '@/api/apiServer'
+import { useRouter } from 'expo-router'
 import { Activity, Bed, Flame, Footprints, Heart, Scale, Users, EllipsisVertical } from '@tamagui/lucide-icons'
 import { useEffect, useState } from 'react'
 import { Button, Card, H3, Paragraph, ScrollView, XStack, YStack } from 'tamagui'
@@ -19,12 +20,16 @@ const iconByCategoryId: any = {
 	7: <Users size="$1" mr="$2" />,
 }
 
+const initialData = [
+	{ id: '1', value: '65', unit: 'bpm', categoryDescription: 'Heart Rate', classes: ['Health', 'Heart'], createdAt: new Date().toISOString() },
+]
+
 export default function () {
 	useEffect(() => {
 		API.getOverview().then(setItems)
 	}, [])
-
-	const [items, setItems] = useState<any[]>([])
+	const router = useRouter()
+	const [items, setItems] = useState<any[]>(initialData)
 
 	return (
 		<ScrollView>
@@ -35,7 +40,17 @@ export default function () {
 			</XStack>
 			<YStack gap="$3" p="$3" pt="$0">
 				{items.map((item, _idx) => (
-					<Card key={item.id} backgroundColor="white" bordered padding="$4" pb="$3" pt="$3" margin="$-1" borderRadius="$radius.6">
+					<Card
+						key={item.id}
+						backgroundColor="white"
+						bordered
+						padding="$4"
+						pb="$3"
+						pt="$3"
+						margin="$-1"
+						borderRadius="$radius.6"
+						onPress={() => router.push(`/datastreams/${item.id}`)}
+					>
 						<YStack flex={1} gap="$1">
 							<XStack gap="$1" justify="space-between">
 								<XStack gap="$1" items="center">
