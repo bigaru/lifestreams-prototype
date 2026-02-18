@@ -22,11 +22,13 @@ const iconByCategoryId: any = {
 
 const initialData = [
 	{ id: '1', value: '65', unit: 'bpm', categoryDescription: 'Heart Rate', classes: ['Health', 'Heart'], createdAt: new Date().toISOString() },
+	{ id: '2', value: '65', unit: '', categoryDescription: 'Step Count', classes: ['Health', 'Heart'], createdAt: new Date().toISOString() },
+	{ id: '3', value: '65', unit: 'h', categoryDescription: 'Sleep', classes: ['Health', 'Heart'], createdAt: new Date().toISOString() },
 ]
 
 export default function () {
 	useEffect(() => {
-		API.getOverview().then(setItems)
+		//API.getOverview().then(setItems)
 	}, [])
 	const router = useRouter()
 	const [items, setItems] = useState<any[]>(initialData)
