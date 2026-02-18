@@ -44,7 +44,7 @@
 		"react-native-web": "~0.21.0",
 		"react-native-worklets": "0.5.1",
 		"tamagui": "1.142.0",
-		"victory-native": "^41.20.2"
+		"victory-native": "41.20.1"
 	},
 	"devDependencies": {
 		"@tamagui/babel-plugin": "1.142.0",
