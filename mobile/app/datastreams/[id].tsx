@@ -1,14 +1,23 @@
+import { useFocusEffect } from '@react-navigation/native'
+import { Circle, Line as SkiaLine, Text as SkiaText, useFont } from '@shopify/react-native-skia'
 import { Stack, useLocalSearchParams } from 'expo-router'
-import { H3, YStack, View, XStack } from 'tamagui'
-import { Area, CartesianChart, CartesianChartRef, getTransformComponents, Line, useChartPressState, useChartTransformState } from 'victory-native'
-import { Circle, useFont } from '@shopify/react-native-skia'
-import { useDerivedValue, type SharedValue } from 'react-native-reanimated'
+import * as ScreenOrientation from 'expo-screen-orientation'
+import { useCallback, useState } from 'react'
+import { useWindowDimensions } from 'react-native'
+import { useDerivedValue } from 'react-native-reanimated'
+import { GetThemeValueForKey, View, YStack } from 'tamagui'
+import { CartesianChart, Line, useChartPressState, useChartTransformState } from 'victory-native'
 import inter from '../../assets/inter-medium.ttf'
-import { Line as SkiaLine, Text as SkiaText } from '@shopify/react-native-skia'
-import { useRef, useState } from 'react'
 import hrData from '../../data/hr.json'
 
-function ChartComponent() {
+interface ChartProps {
+	my: number | GetThemeValueForKey<'marginVertical'>
+	width: number | GetThemeValueForKey<'width'>
+	color: string
+}
+
+function ChartComponent(props: ChartProps) {
+	const { my, color, width } = props
 	const font = useFont(inter, 12)
 	const fontTooltip = useFont(inter, 18)
 
@@ -27,7 +36,7 @@ function ChartComponent() {
 	return (
 		<>
 			<YStack items="center" justify="center" flex={1}>
-				<View my="$10" flex={1} width="90%">
+				<View my={my} flex={1} width={width}>
 					<CartesianChart
 						data={hrData}
 						domain={{ y: [20, 220] }}
@@ -51,7 +60,7 @@ function ChartComponent() {
 					>
 						{({ points }) => (
 							<>
-								<Line points={points.y} color="red" strokeWidth={2} />
+								<Line points={points.y} color={color} strokeWidth={2} />
 								{isActive && (
 									<>
 										<SkiaLine p1={verticalLine_p1} p2={verticalLine_p2} strokeWidth={1} />
@@ -69,12 +78,20 @@ function ChartComponent() {
 
 export default function () {
 	const { id } = useLocalSearchParams<{ id: string }>()
+	const { width, height } = useWindowDimensions()
+	const isLandscape = width > height
+
+	useFocusEffect(
+		useCallback(() => {
+			ScreenOrientation.unlockAsync()
+			return () => ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT_UP)
+		}, [])
+	)
 
 	return (
 		<>
-			<Stack.Screen options={{ title: `Datastreams ${id}` }} />
-
-			<ChartComponent />
+			<Stack.Screen options={{ title: `Datastreams ${id}`, headerShown: !isLandscape }} />
+			<ChartComponent my={isLandscape ? '$5' : '$10'} width={isLandscape ? '80%' : '90%'} color="red" />
 		</>
 	)
 }
