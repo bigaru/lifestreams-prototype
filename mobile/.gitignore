@@ -43,3 +43,6 @@ app-example
 /android
 
 .tamagui/
+
+# health data
+data/
