@@ -6,7 +6,7 @@ import * as ScreenOrientation from 'expo-screen-orientation'
 import { useCallback, useState } from 'react'
 import { useWindowDimensions } from 'react-native'
 import { Button, Paragraph, XGroup, XStack, YStack } from 'tamagui'
-import hrData from '../../data/hr.json'
+import useStore from '../../store'
 
 const formatOpt: Intl.DateTimeFormatOptions = {
 	weekday: 'short', // Mon
@@ -25,13 +25,15 @@ export default function () {
 			return () => ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT_UP)
 		}, [])
 	)
+
+	const data = useStore((state) => state.datastreamsById[Number(id)])
 	const [selectedStep, setStep] = useState('1d')
 	const [selectedDate, setDate] = useState(new Date())
 
 	const steps = ['1d', '7d', '4w', '1y']
 	const performanceIndicators = [
-		{ title: 'resting', value: Math.min(...hrData.map((e) => e.y)), unit: 'bpm' },
-		{ title: 'high', value: Math.max(...hrData.map((e) => e.y)), unit: 'bpm' },
+		{ title: 'resting', value: Math.min(...data.map((e) => e.y)), unit: 'bpm' },
+		{ title: 'high', value: Math.max(...data.map((e) => e.y)), unit: 'bpm' },
 	]
 
 	return (
@@ -78,7 +80,7 @@ export default function () {
 					mb={!isLandscape ? '$10' : null}
 					width={'90%'}
 					color="red"
-					data={hrData}
+					data={data}
 				/>
 			</YStack>
 		</>

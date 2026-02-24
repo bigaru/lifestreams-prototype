@@ -3,6 +3,7 @@ import { useRouter } from 'expo-router'
 import { Activity, Bed, Flame, Footprints, Heart, Scale, Users, EllipsisVertical } from '@tamagui/lucide-icons'
 import { useEffect, useState } from 'react'
 import { Button, Card, H3, Paragraph, ScrollView, XStack, YStack } from 'tamagui'
+import useStore from '../../store'
 
 const formatOpt: Intl.DateTimeFormatOptions = {
 	weekday: 'short', // Mon
@@ -20,18 +21,12 @@ const iconByCategoryId: any = {
 	7: <Users size="$1" mr="$2" />,
 }
 
-const initialData = [
-	{ id: '1', value: '65', unit: 'bpm', categoryDescription: 'Heart Rate', classes: ['Health', 'Heart'], createdAt: new Date().toISOString() },
-	{ id: '2', value: '65', unit: '', categoryDescription: 'Step Count', classes: ['Health', 'Heart'], createdAt: new Date().toISOString() },
-	{ id: '3', value: '65', unit: 'h', categoryDescription: 'Sleep', classes: ['Health', 'Heart'], createdAt: new Date().toISOString() },
-]
-
 export default function () {
 	useEffect(() => {
-		//API.getOverview().then(setItems)
+		//API.getOverview().then(setOverviews)
 	}, [])
 	const router = useRouter()
-	const [items, setItems] = useState<any[]>(initialData)
+	const { overviews, setOverviews } = useStore()
 
 	return (
 		<ScrollView>
@@ -41,7 +36,7 @@ export default function () {
 				</H3>
 			</XStack>
 			<YStack gap="$3" p="$3" pt="$0">
-				{items.map((item, _idx) => (
+				{overviews.map((item, _idx) => (
 					<Card
 						key={item.id}
 						backgroundColor="white"
