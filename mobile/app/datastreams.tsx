@@ -6,7 +6,7 @@ import * as ScreenOrientation from 'expo-screen-orientation'
 import { useCallback, useState } from 'react'
 import { useWindowDimensions } from 'react-native'
 import { Button, Paragraph, XGroup, XStack, YStack } from 'tamagui'
-import useStore from '../../store'
+import useStore from '../store'
 
 const formatOpt: Intl.DateTimeFormatOptions = {
 	weekday: 'short', // Mon
@@ -15,9 +15,13 @@ const formatOpt: Intl.DateTimeFormatOptions = {
 }
 
 export default function () {
-	const { id } = useLocalSearchParams<{ id: string }>()
+	const { first, second = '' } = useLocalSearchParams<{ first: string; second: string }>()
 	const { width, height } = useWindowDimensions()
 	const isLandscape = width > height
+
+	const firstId = Number(first ?? 0)
+	const secondId = Number(second ?? 0)
+	const isComparison = !!(firstId && secondId)
 
 	useFocusEffect(
 		useCallback(() => {
@@ -26,19 +30,24 @@ export default function () {
 		}, [])
 	)
 
-	const data = useStore((state) => state.datastreamsById[Number(id)])
+	const title = useStore((state) => {
+		const firstTitle = state.overviews.find((i) => i.id === firstId)?.categoryDescription ?? ''
+		const seconditle = state.overviews.find((i) => i.id === secondId)?.categoryDescription ?? ''
+		return isComparison ? `${firstTitle} and ${seconditle}` : firstTitle
+	})
+	const firstData = useStore((state) => state.datastreamsById[firstId])
 	const [selectedStep, setStep] = useState('1d')
 	const [selectedDate, setDate] = useState(new Date())
 
 	const steps = ['1d', '7d', '4w', '1y']
 	const performanceIndicators = [
-		{ title: 'resting', value: Math.min(...data.map((e) => e.y)), unit: 'bpm' },
-		{ title: 'high', value: Math.max(...data.map((e) => e.y)), unit: 'bpm' },
+		{ title: 'resting', value: Math.min(...firstData.map((e) => e.y)), unit: 'bpm' },
+		{ title: 'high', value: Math.max(...firstData.map((e) => e.y)), unit: 'bpm' },
 	]
 
 	return (
 		<>
-			<Stack.Screen options={{ title: `Datastreams ${id}`, headerShown: !isLandscape }} />
+			<Stack.Screen options={{ title: title, headerShown: !isLandscape }} />
 			{!isLandscape && (
 				<XGroup mx="$4" my="$5">
 					{steps.map((s) => (
@@ -51,7 +60,7 @@ export default function () {
 				</XGroup>
 			)}
 			<YStack bg="white" flex={1}>
-				{!isLandscape && (
+				{!isLandscape && !isComparison && (
 					<>
 						<XStack justify="space-between" items="center">
 							<Button icon={ChevronLeft} chromeless />
@@ -80,7 +89,7 @@ export default function () {
 					mb={!isLandscape ? '$10' : null}
 					width={'90%'}
 					color="red"
-					data={data}
+					firstData={firstData}
 				/>
 			</YStack>
 		</>

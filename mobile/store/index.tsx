@@ -24,7 +24,7 @@ const initialData = [
 
 const useStore = create<State>((set) => ({
 	overviews: initialData,
-	datastreamsById: { 1: hrData },
+	datastreamsById: { 1: hrData, 2: hrData, 3: hrData },
 	setOverviews: (newData: DatastreamOverview[]) => set((state) => ({ ...state, overviews: newData })),
 }))
 

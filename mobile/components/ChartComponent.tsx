@@ -7,11 +7,12 @@ import inter from '../assets/inter-medium.ttf'
 
 interface ChartProps extends ViewProps {
 	color: string
-	data: { x: number; y: number }[]
+	firstData: { x: number; y: number }[]
+	secondData?: { x: number; y: number }[]
 }
 
 export function ChartComponent(props: ChartProps) {
-	const { color, data, ...ViewProps } = props
+	const { color, firstData, secondData = [], ...ViewProps } = props
 	const font = useFont(inter, 12)
 	const fontTooltip = useFont(inter, 18)
 
@@ -32,7 +33,7 @@ export function ChartComponent(props: ChartProps) {
 			<YStack items="center" justify="center" flex={1}>
 				<View flex={1} {...ViewProps}>
 					<CartesianChart
-						data={data}
+						data={firstData}
 						domain={{ y: [20, 220] }}
 						padding={{ top: 30 }}
 						xKey={'x'}
