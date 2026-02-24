@@ -1,79 +1,17 @@
+import { ChartComponent } from '@/components/ChartComponent'
 import { useFocusEffect } from '@react-navigation/native'
-import { Circle, Line as SkiaLine, Text as SkiaText, useFont } from '@shopify/react-native-skia'
+import { ChevronLeft, ChevronRight } from '@tamagui/lucide-icons'
 import { Stack, useLocalSearchParams } from 'expo-router'
 import * as ScreenOrientation from 'expo-screen-orientation'
 import { useCallback, useState } from 'react'
 import { useWindowDimensions } from 'react-native'
-import { useDerivedValue } from 'react-native-reanimated'
-import { GetThemeValueForKey, View, YStack } from 'tamagui'
-import { CartesianChart, Line, useChartPressState, useChartTransformState } from 'victory-native'
-import inter from '../../assets/inter-medium.ttf'
+import { Button, Paragraph, XGroup, XStack, YStack } from 'tamagui'
 import hrData from '../../data/hr.json'
 
-interface ChartProps {
-	my: number | GetThemeValueForKey<'marginVertical'>
-	width: number | GetThemeValueForKey<'width'>
-	color: string
-}
-
-function ChartComponent(props: ChartProps) {
-	const { my, color, width } = props
-	const font = useFont(inter, 12)
-	const fontTooltip = useFont(inter, 18)
-
-	const [chartTop, setChartTop] = useState(0)
-	const [chartBottom, setChartBottom] = useState(0)
-
-	const { state, isActive } = useChartPressState({ x: 0, y: { y: 0 } })
-	const { state: transformState } = useChartTransformState()
-
-	const verticalLine_p1 = useDerivedValue(() => ({ x: state.x.position.value, y: chartTop }))
-	const verticalLine_p2 = useDerivedValue(() => ({ x: state.x.position.value, y: chartBottom }))
-
-	const toolTipLabel = useDerivedValue(() => state.y.y.value.value.toFixed(2))
-	const realingedX = useDerivedValue(() => state.x.position.value - 25)
-
-	return (
-		<>
-			<YStack items="center" justify="center" flex={1}>
-				<View my={my} flex={1} width={width}>
-					<CartesianChart
-						data={hrData}
-						domain={{ y: [20, 220] }}
-						padding={{ top: 30 }}
-						xKey={'x'}
-						yKeys={['y']}
-						yAxis={[{ font: font }]}
-						xAxis={{
-							font: font,
-							formatXLabel: (l) => String(new Date(l).getHours()).padStart(2, '0'),
-							tickCount: 8,
-						}}
-						chartPressState={state}
-						transformConfig={{ pan: { enabled: false, dimensions: ['x'] }, pinch: { enabled: false, dimensions: ['x'] } }}
-						transformState={transformState}
-						onChartBoundsChange={({ top, bottom }) => {
-							setChartTop(top)
-							setChartBottom(bottom)
-						}}
-						renderOutside={() => <>{isActive && <SkiaText x={realingedX} y={chartTop - 10} font={fontTooltip} text={toolTipLabel} />}</>}
-					>
-						{({ points }) => (
-							<>
-								<Line points={points.y} color={color} strokeWidth={2} />
-								{isActive && (
-									<>
-										<SkiaLine p1={verticalLine_p1} p2={verticalLine_p2} strokeWidth={1} />
-										<Circle cx={state.x.position} cy={state.y.y.position} r={6} color={'black'} />
-									</>
-								)}
-							</>
-						)}
-					</CartesianChart>
-				</View>
-			</YStack>
-		</>
-	)
+const formatOpt: Intl.DateTimeFormatOptions = {
+	weekday: 'short', // Mon
+	day: '2-digit', // 12
+	month: 'short', // Jan
 }
 
 export default function () {
@@ -87,11 +25,62 @@ export default function () {
 			return () => ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT_UP)
 		}, [])
 	)
+	const [selectedStep, setStep] = useState('1d')
+	const [selectedDate, setDate] = useState(new Date())
+
+	const steps = ['1d', '7d', '4w', '1y']
+	const performanceIndicators = [
+		{ title: 'resting', value: Math.min(...hrData.map((e) => e.y)), unit: 'bpm' },
+		{ title: 'high', value: Math.max(...hrData.map((e) => e.y)), unit: 'bpm' },
+	]
 
 	return (
 		<>
 			<Stack.Screen options={{ title: `Datastreams ${id}`, headerShown: !isLandscape }} />
-			<ChartComponent my={isLandscape ? '$5' : '$10'} width={isLandscape ? '80%' : '90%'} color="red" />
+			{!isLandscape && (
+				<XGroup mx="$4" my="$5">
+					{steps.map((s) => (
+						<XGroup.Item key={s}>
+							<Button width="25%" mx={0} borderWidth={0} size="$3" theme={selectedStep === s ? 'accent' : null} onPress={() => setStep(s)}>
+								{s}
+							</Button>
+						</XGroup.Item>
+					))}
+				</XGroup>
+			)}
+			<YStack bg="white" flex={1}>
+				{!isLandscape && (
+					<>
+						<XStack justify="space-between" items="center">
+							<Button icon={ChevronLeft} chromeless />
+							<Paragraph>{selectedDate.toLocaleDateString('de-CH', formatOpt)}</Paragraph>
+							<Button icon={ChevronRight} chromeless />
+						</XStack>
+						<XStack items="center" mx="$4" justify="space-around">
+							{performanceIndicators.map((e) => (
+								<YStack key={e.title}>
+									<Paragraph mb="$-2" size="$2" fontWeight="800" textTransform="uppercase" color="$black10">
+										{e.title}
+									</Paragraph>
+									<XStack items="baseline">
+										<Paragraph size="$10">{e.value}</Paragraph>
+										<Paragraph size="$4">{e.unit}</Paragraph>
+									</XStack>
+								</YStack>
+							))}
+						</XStack>
+					</>
+				)}
+				<ChartComponent
+					my={isLandscape ? '$6' : null}
+					px={isLandscape ? '$6' : null}
+					mt={!isLandscape ? 0 : null}
+					mb={!isLandscape ? '$10' : null}
+					width={'90%'}
+					color="red"
+					data={hrData}
+				/>
+			</YStack>
 		</>
 	)
 }
