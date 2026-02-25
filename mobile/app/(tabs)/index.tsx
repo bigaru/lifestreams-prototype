@@ -22,6 +22,8 @@ const iconByCategoryId: any = {
 	7: <Users size="$1" mr="$2" />,
 }
 
+const noop = () => {}
+
 export default function () {
 	useEffect(() => {
 		//API.getOverview().then(setOverviews)
@@ -30,17 +32,6 @@ export default function () {
 	const { overviews, setOverviews } = useStore()
 	const [selectedOnes, setSelectedOnes] = useState<number[]>([])
 	const isSelectionNonEmpty = selectedOnes.length > 0
-
-	const getIds = (id: number) => {
-		if (isSelectionNonEmpty && selectedOnes.length == 2) {
-			return { first: selectedOnes[0], second: selectedOnes[1] }
-		}
-		if (isSelectionNonEmpty) {
-			return { first: selectedOnes[0], second: id }
-		}
-
-		return { first: id, second: '' }
-	}
 
 	return (
 		<>
@@ -57,7 +48,7 @@ export default function () {
 						isSelectionNonEmpty ? (
 							<ArrowLeftRight
 								disabled={selectedOnes.length !== 2}
-								onPress={() => router.push({ pathname: `/datastreams/`, params: { first: selectedOnes[0], second: selectedOnes[1] } })}
+								onPress={() => router.push({ pathname: `/datastreams`, params: { first: selectedOnes[0], second: selectedOnes[1] } })}
 								size="$2.5"
 								m="$4"
 								strokeWidth={1}
@@ -82,7 +73,11 @@ export default function () {
 							pt="$3"
 							margin="$-1"
 							borderRadius="$radius.6"
-							onPress={() => router.push({ pathname: `/datastreams/`, params: getIds(item.id) })}
+							onPress={() => {
+								if (!isSelectionNonEmpty) {
+									router.push({ pathname: `/datastreams`, params: { first: item.id, second: '' } })
+								}
+							}}
 							onLongPress={() => {
 								if (selectedOnes.includes(item.id)) {
 									setSelectedOnes(selectedOnes.filter((i) => i !== item.id))

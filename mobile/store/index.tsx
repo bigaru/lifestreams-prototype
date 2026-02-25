@@ -1,5 +1,7 @@
 import { create } from 'zustand'
-import hrData from '../data/hr.json'
+import hr1Data from '../data/hr1.json'
+import hr2Data from '../data/hr2.json'
+import hr3Data from '../data/hr3.json'
 
 interface DatastreamOverview {
 	id: number
@@ -22,9 +24,13 @@ const initialData = [
 	{ id: 3, value: 7.5, unit: 'h', categoryDescription: 'Sleep', classes: ['Health'], createdAt: new Date().toISOString() },
 ]
 
+const hr1 = hr1Data.map(([x, y]) => ({ x, y }))
+const hr2 = hr2Data.map(([x, y]) => ({ x, y }))
+const hr3 = hr3Data.map(([x, y]) => ({ x, y }))
+
 const useStore = create<State>((set) => ({
 	overviews: initialData,
-	datastreamsById: { 1: hrData, 2: hrData, 3: hrData },
+	datastreamsById: { 1: hr1, 2: hr2, 3: hr3 },
 	setOverviews: (newData: DatastreamOverview[]) => set((state) => ({ ...state, overviews: newData })),
 }))
 

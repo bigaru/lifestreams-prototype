@@ -36,6 +36,8 @@ export default function () {
 		return isComparison ? `${firstTitle} and ${seconditle}` : firstTitle
 	})
 	const firstData = useStore((state) => state.datastreamsById[firstId])
+	const secondData = useStore((state) => state.datastreamsById[secondId]) ?? []
+
 	const [selectedStep, setStep] = useState('1d')
 	const [selectedDate, setDate] = useState(new Date())
 
@@ -60,27 +62,27 @@ export default function () {
 				</XGroup>
 			)}
 			<YStack bg="white" flex={1}>
+				{!isLandscape && (
+					<XStack justify="space-between" items="center">
+						<Button icon={ChevronLeft} chromeless />
+						<Paragraph>{selectedDate.toLocaleDateString('de-CH', formatOpt)}</Paragraph>
+						<Button icon={ChevronRight} chromeless />
+					</XStack>
+				)}
 				{!isLandscape && !isComparison && (
-					<>
-						<XStack justify="space-between" items="center">
-							<Button icon={ChevronLeft} chromeless />
-							<Paragraph>{selectedDate.toLocaleDateString('de-CH', formatOpt)}</Paragraph>
-							<Button icon={ChevronRight} chromeless />
-						</XStack>
-						<XStack items="center" mx="$4" justify="space-around">
-							{performanceIndicators.map((e) => (
-								<YStack key={e.title}>
-									<Paragraph mb="$-2" size="$2" fontWeight="800" textTransform="uppercase" color="$black10">
-										{e.title}
-									</Paragraph>
-									<XStack items="baseline">
-										<Paragraph size="$10">{e.value}</Paragraph>
-										<Paragraph size="$4">{e.unit}</Paragraph>
-									</XStack>
-								</YStack>
-							))}
-						</XStack>
-					</>
+					<XStack items="center" mx="$4" justify="space-around">
+						{performanceIndicators.map((e) => (
+							<YStack key={e.title}>
+								<Paragraph mb="$-2" size="$2" fontWeight="800" textTransform="uppercase" color="$black10">
+									{e.title}
+								</Paragraph>
+								<XStack items="baseline">
+									<Paragraph size="$10">{e.value}</Paragraph>
+									<Paragraph size="$4">{e.unit}</Paragraph>
+								</XStack>
+							</YStack>
+						))}
+					</XStack>
 				)}
 				<ChartComponent
 					my={isLandscape ? '$6' : null}
@@ -88,8 +90,14 @@ export default function () {
 					mt={!isLandscape ? 0 : null}
 					mb={!isLandscape ? '$10' : null}
 					width={'90%'}
-					color="red"
-					firstData={firstData}
+					isComparison={isComparison}
+					unit={['bpm', 'bpm']}
+					color={['red', 'green']}
+					data={[firstData, secondData]}
+					domain={[
+						[20, 220],
+						[20, 220],
+					]}
 				/>
 			</YStack>
 		</>
