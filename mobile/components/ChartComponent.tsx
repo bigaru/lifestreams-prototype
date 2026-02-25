@@ -197,8 +197,8 @@ function DualAxisChart(props: ChartProps) {
 			>
 				{({ points }) => (
 					<>
-						<Line points={points.y1} color={color[0]} strokeWidth={1} />
-						<Line points={points.y2} color={color[1]} strokeWidth={1} />
+						<Line points={points.y1} color={color[0]} strokeWidth={1} connectMissingData />
+						<Line points={points.y2} color={color[1]} strokeWidth={1} connectMissingData />
 						{isActive && (
 							<>
 								<SkiaLine p1={verticalLine_p1} p2={verticalLine_p2} strokeWidth={1} />

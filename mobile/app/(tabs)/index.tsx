@@ -12,7 +12,7 @@ const formatOpt: Intl.DateTimeFormatOptions = {
 	month: 'short', // Jan
 }
 
-const iconByCategoryId: any = {
+const iconByCategoryId: Record<number, React.ReactElement> = {
 	1: <Heart size="$1" mr="$2" />,
 	2: <Footprints size="$1" mr="$2" />,
 	3: <Bed size="$1" mr="$2" />,

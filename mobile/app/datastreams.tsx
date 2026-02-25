@@ -14,6 +14,23 @@ const formatOpt: Intl.DateTimeFormatOptions = {
 	month: 'short', // Jan
 }
 
+function createIndicators(id: number, data: { y: number }[]) {
+	switch (id) {
+		case 1:
+		case 3:
+			return [
+				{ title: 'resting', value: Math.min(...data.map((e) => e.y)) },
+				{ title: 'high', value: Math.max(...data.map((e) => e.y)) },
+			]
+		case 2:
+		case 4:
+			return [{ title: 'total', value: Math.max(...data.map((e) => e.y)) }]
+
+		default:
+			return []
+	}
+}
+
 export default function () {
 	const { first, second = '' } = useLocalSearchParams<{ first: string; second: string }>()
 	const { width, height } = useWindowDimensions()
@@ -38,14 +55,22 @@ export default function () {
 	const firstData = useStore((state) => state.datastreamsById[firstId])
 	const secondData = useStore((state) => state.datastreamsById[secondId]) ?? []
 
+	const {
+		unit: firstUnit,
+		color: firstColor,
+		domain: firstDomain,
+	} = useStore((state) => state.overviews.find((i) => i.id === firstId)) ?? { unit: '', color: 'black', domain: [0, 100] }
+	const {
+		unit: secondUnit,
+		color: secondColor,
+		domain: secondDomain,
+	} = useStore((state) => state.overviews.find((i) => i.id === secondId)) ?? { unit: '', color: 'black', domain: [0, 100] }
+
 	const [selectedStep, setStep] = useState('1d')
 	const [selectedDate, setDate] = useState(new Date())
 
 	const steps = ['1d', '7d', '4w', '1y']
-	const performanceIndicators = [
-		{ title: 'resting', value: Math.min(...firstData.map((e) => e.y)), unit: 'bpm' },
-		{ title: 'high', value: Math.max(...firstData.map((e) => e.y)), unit: 'bpm' },
-	]
+	const performanceIndicators = createIndicators(firstId, firstData)
 
 	return (
 		<>
@@ -78,7 +103,7 @@ export default function () {
 								</Paragraph>
 								<XStack items="baseline">
 									<Paragraph size="$10">{e.value}</Paragraph>
-									<Paragraph size="$4">{e.unit}</Paragraph>
+									<Paragraph size="$4">{firstUnit}</Paragraph>
 								</XStack>
 							</YStack>
 						))}
@@ -91,13 +116,10 @@ export default function () {
 					mb={!isLandscape ? '$10' : null}
 					width={'90%'}
 					isComparison={isComparison}
-					unit={['bpm', 'bpm']}
-					color={['red', 'green']}
+					unit={[firstUnit, secondUnit]}
+					color={[firstColor, secondColor]}
 					data={[firstData, secondData]}
-					domain={[
-						[20, 220],
-						[20, 220],
-					]}
+					domain={[firstDomain, secondDomain] as any}
 				/>
 			</YStack>
 		</>
