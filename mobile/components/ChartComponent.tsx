@@ -155,15 +155,15 @@ function DualAxisChart(props: ChartProps) {
 		}
 		return n.toFixed(0)
 	})
-	const realingedX1 = useDerivedValue(() => state.x.position.value - 28)
-	const realingedX2 = useDerivedValue(() => state.x.position.value + 5)
+	const realingedX1 = useDerivedValue(() => state.x.position.value - 12)
+	const realingedX2 = useDerivedValue(() => state.x.position.value - 12)
 
 	return (
 		<>
 			<CartesianChart
 				data={zippedData}
 				domain={{ x: X_DOMAIN_DAY }}
-				padding={{ top: 30 }}
+				padding={{ top: 50 }}
 				xKey={'x'}
 				yKeys={['y1', 'y2']}
 				yAxis={[
@@ -184,11 +184,11 @@ function DualAxisChart(props: ChartProps) {
 				}}
 				renderOutside={({ chartBounds }) => (
 					<>
-						<SkiaText x={0} y={chartTop} font={font} text={unit[0]} />
-						<SkiaText x={chartBounds.right} y={chartTop} font={font} text={unit[0]} />
+						<SkiaText x={0} y={chartTop - 20} font={font} text={unit[0]} />
+						<SkiaText x={chartBounds.right} y={chartTop - 20} font={font} text={unit[1]} />
 						{isActive && (
 							<>
-								<SkiaText x={realingedX1} y={chartTop - 10} color={color[0]} font={fontTooltip} text={toolTipLabel1} />
+								<SkiaText x={realingedX1} y={chartTop - 30} color={color[0]} font={fontTooltip} text={toolTipLabel1} />
 								<SkiaText x={realingedX2} y={chartTop - 10} color={color[1]} font={fontTooltip} text={toolTipLabel2} />
 							</>
 						)}
