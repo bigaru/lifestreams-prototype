@@ -12,8 +12,10 @@
 	"dependencies": {
 		"@lifestreams/shared": "^1.0.0",
 		"@tamagui/config": "1.142.0",
+		"@tamagui/lucide-icons": "^1.142.0",
 		"react": "^19.2.0",
 		"react-dom": "^19.2.0",
+		"react-router": "^7.13.1",
 		"tamagui": "1.142.0"
 	},
 	"devDependencies": {
