@@ -13,6 +13,8 @@
 		"@lifestreams/shared": "^1.0.0",
 		"@tamagui/config": "1.142.0",
 		"@tamagui/lucide-icons": "^1.142.0",
+		"primeicons": "^7.0.0",
+		"primereact": "^10.9.7",
 		"react": "^19.2.0",
 		"react-dom": "^19.2.0",
 		"react-router": "^7.13.1",

@@ -1,5 +1,5 @@
 import { TamaguiProvider, Theme } from '@tamagui/core'
-import { ChartPie, Folder, HelpCircle, Info, Search, Settings, UserCircle2 } from '@tamagui/lucide-icons'
+import { Folder, HelpCircle, Info, Search, Settings, UserCircle2 } from '@tamagui/lucide-icons'
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter, Link, Route, Routes, useLocation } from 'react-router'
@@ -9,7 +9,6 @@ import DataTypes from './DataTypes.tsx'
 
 const menuItems = [
 	{ path: '/data-types', title: 'Discover Data Types', icon: Search },
-	{ path: '/', title: 'Data Availability', icon: ChartPie },
 	{ path: '/', title: 'Projects', icon: Folder },
 	{ path: '/', title: 'Documentation', icon: Info },
 ]
