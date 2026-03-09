@@ -36,6 +36,20 @@ type ChartWrapperProps = { isComparison: boolean } & ChartProps & ViewProps
 
 const X_DOMAIN_DAY: [number, number] = [0, 24 * 60]
 
+function findClosestPoint(data: MultiPoint[], targetX: number): MultiPoint | null {
+	'worklet'
+	if (!data.length || data[data.length - 1].x < targetX) return null
+
+	return data.reduce((closest, point) => {
+		const d1 = Math.abs(point.x - targetX)
+		const d2 = Math.abs(closest.x - targetX)
+
+		if (d1 < d2) return point
+		if (d1 > d2) return closest
+		return point.x < closest.x ? point : closest
+	})
+}
+
 export function ChartComponent(props: ChartWrapperProps) {
 	const { isComparison, unit, color, data, domain, ...ViewProps } = props
 
@@ -131,6 +145,8 @@ function DualAxisChart(props: ChartProps) {
 	const fontTooltip = useFont(inter, 18)
 
 	const zippedData = zipAlongXCoord(firstData, secondData)
+	const onlyY1Data = zippedData.filter((i) => i.y1)
+	const onlyY2Data = zippedData.filter((i) => i.y2)
 
 	const [chartTop, setChartTop] = useState(0)
 	const [chartBottom, setChartBottom] = useState(0)
@@ -144,14 +160,16 @@ function DualAxisChart(props: ChartProps) {
 	const toolTipLabel1 = useDerivedValue(() => {
 		const n = state.y.y1.value.value
 		if (!Number.isFinite(n)) {
-			return '-'
+			const found = findClosestPoint(onlyY1Data, state.x.value.value)
+			return found ? (found.y1 ?? 0).toFixed(0) : '-'
 		}
 		return n.toFixed(0)
 	})
 	const toolTipLabel2 = useDerivedValue(() => {
 		const n = state.y.y2.value.value
 		if (!Number.isFinite(n)) {
-			return '-'
+			const found = findClosestPoint(onlyY2Data, state.x.value.value)
+			return found ? (found.y2 ?? 0).toFixed(0) : '-'
 		}
 		return n.toFixed(0)
 	})
