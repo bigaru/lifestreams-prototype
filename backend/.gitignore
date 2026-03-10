@@ -38,3 +38,6 @@ out/
 
 ### Kotlin ###
 .kotlin
+
+# health data
+db/init/data/

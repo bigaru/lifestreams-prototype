@@ -1,5 +1,8 @@
 services:
   db:
+    build:
+      context: .
+      dockerfile: postgres.Dockerfile
     image: postgres:18
     container_name: pg-dev
     environment:

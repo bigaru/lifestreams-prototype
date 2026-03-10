@@ -53,3 +53,7 @@ CREATE VIEW datastream_overview AS
 	LEFT JOIN categories cat ON icat.category_id = cat.id
 	LEFT JOIN individual_devices idev ON icat.device_id = idev.id
 	ORDER BY icat.id, ds.created_at DESC;
+
+
+-- Extensions
+CREATE EXTENSION plpython3u;

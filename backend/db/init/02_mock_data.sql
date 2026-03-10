@@ -25,7 +25,7 @@ INSERT INTO individual_categories (category_id, unit, device_id) VALUES
 	(7, 'h', 2);
 
 INSERT INTO datastreams (individual_category_id, created_at, value) VALUES
-  (1, now() - interval '7 days',  58.0),
+  --(1, now() - interval '7 days',  58.0),
   (2, now() - interval '1 day',   6200.0),
   (3, now(),                      7.5),
   (4, now() - interval '20 day',  110.0),
