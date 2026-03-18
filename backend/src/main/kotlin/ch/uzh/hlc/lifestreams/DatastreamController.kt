@@ -3,6 +3,7 @@ package ch.uzh.hlc.lifestreams
 import ch.uzh.hlc.lifestreams.model.DatastreamOverview
 import ch.uzh.hlc.lifestreams.model.DatastreamOverviewRepository
 import ch.uzh.hlc.lifestreams.model.LastDatastreamRepository
+import ch.uzh.hlc.lifestreams.model.WindowSize
 import kotlinx.coroutines.flow.Flow
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -33,8 +34,13 @@ class DatastreamController(
 		return overviewRepo.findAllByIndividualId(individualId)
 	}
 
-	@GetMapping("/last7/{individualId}")
-	fun last(@PathVariable("individualId") individualId: UUID, @RequestParam(defaultValue = "0") page: Int, @RequestParam categoryId: Long): Flux<List<Any?>> {
-		return lastRepo.fetchLast7Days("avg", page, individualId, categoryId)
+	@GetMapping("/last/{individualId}")
+	fun last(
+		@PathVariable("individualId") individualId: UUID,
+		@RequestParam(defaultValue = "0") page: Int,
+		@RequestParam categoryId: Long,
+		@RequestParam window: WindowSize
+	): Flux<List<Any?>> {
+		return lastRepo.fetchLastData(window, "avg", page, individualId, categoryId)
 	}
 }

@@ -49,7 +49,35 @@ CREATE INDEX IF NOT EXISTS idx_datastreams_individual_category_id ON datastreams
 
 
 -- Functions
-CREATE OR REPLACE FUNCTION last(window_size varchar(1), page int, p_individual_id UUID, p_category_id BIGINT)
+CREATE OR REPLACE FUNCTION last_single_day(page int, p_individual_id UUID, p_category_id BIGINT)
+RETURNS TABLE (
+    instant TIMESTAMPTZ, value numeric
+)
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    lower_bound TIMESTAMPTZ;
+    upper_bound TIMESTAMPTZ;
+BEGIN
+    lower_bound := CURRENT_DATE - (page * INTERVAL '1 day');
+    upper_bound := CURRENT_DATE - (page * INTERVAL '1 day') + INTERVAL '1 day';
+
+  RETURN QUERY
+	SELECT
+		ds.created_at AS instant,
+		ROUND(ds.value::numeric, 2)
+	FROM datastreams ds
+	LEFT JOIN individual_categories icat ON ds.individual_category_id = icat.id
+	LEFT JOIN individual_devices idev ON icat.device_id = idev.id
+	WHERE ds.created_at >= lower_bound
+		AND ds.created_at < upper_bound
+		AND idev.individual_id = p_individual_id
+		AND icat.category_id = p_category_id
+	ORDER BY instant DESC;
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION last_n_days(window_size varchar(1), page int, p_individual_id UUID, p_category_id BIGINT)
 RETURNS TABLE (
     instant TIMESTAMPTZ, avg numeric, sum numeric, min numeric, max numeric
 )
@@ -58,28 +86,22 @@ AS $$
 DECLARE
     lower_bound TIMESTAMPTZ;
     upper_bound TIMESTAMPTZ;
-	sample_rate varchar(16);
 BEGIN
     lower_bound := CASE window_size
-        WHEN 'y' THEN date_trunc('month', CURRENT_DATE) - (page * INTERVAL '1 year') - INTERVAL '11 months'
+        WHEN 'y' THEN CURRENT_DATE - (page * INTERVAL '1 year') - INTERVAL '1 year - 1 day'
         WHEN 'm' THEN CURRENT_DATE - (page * INTERVAL '4 week') - INTERVAL '3 weeks 6 days'
         ELSE CURRENT_DATE - (page * INTERVAL '1 week') - INTERVAL '6 days'
     END CASE;
 
     upper_bound := CASE window_size
-        WHEN 'y' THEN date_trunc('month', CURRENT_DATE) - (page * INTERVAL '1 year') + INTERVAL '1 month'
+        WHEN 'y' THEN CURRENT_DATE - (page * INTERVAL '1 year') + INTERVAL '1 day'
         WHEN 'm' THEN CURRENT_DATE - (page * INTERVAL '4 week') + INTERVAL '1 day'
         ELSE CURRENT_DATE - (page * INTERVAL '1 week') + INTERVAL '1 day'
     END CASE;
 
-    sample_rate := CASE window_size
-        WHEN 'y' THEN 'month'
-        ELSE 'day'
-    END CASE;
-
-    RETURN QUERY
+  RETURN QUERY
 	SELECT
-		date_trunc(sample_rate, ds.created_at) AS instant,
+		date_trunc('day', ds.created_at) AS instant,
 		ROUND(AVG(ds.value)::numeric, 2),
 		ROUND(SUM(ds.value)::numeric, 2),
 		ROUND(MIN(ds.value)::numeric, 2),
@@ -93,6 +115,34 @@ BEGIN
 		AND icat.category_id = p_category_id
 	GROUP BY instant
 	ORDER BY instant DESC;
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION last_twelve_months(page int, p_individual_id UUID, p_category_id BIGINT)
+RETURNS TABLE (
+    instant TIMESTAMPTZ, avg numeric, sum numeric, min numeric, max numeric
+)
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    lower_bound TIMESTAMPTZ;
+    upper_bound TIMESTAMPTZ;
+BEGIN
+    lower_bound := date_trunc('month', CURRENT_DATE) - (page * INTERVAL '1 year') - INTERVAL '11 months';
+    upper_bound := date_trunc('month', CURRENT_DATE) - (page * INTERVAL '1 year') + INTERVAL '1 month';
+
+  RETURN QUERY
+	SELECT
+		date_trunc('month', ds.instant) AS instant,
+		ROUND(AVG(ds.avg), 2),
+		ROUND(AVG(ds.sum), 2),
+		ROUND(AVG(ds.min), 2),
+		ROUND(AVG(ds.max), 2)
+	FROM last_n_days('y', page, p_individual_id, p_category_id) AS ds
+	WHERE ds.instant >= lower_bound
+		AND ds.instant  < upper_bound
+	GROUP BY date_trunc('month', ds.instant)
+	ORDER BY date_trunc('month', ds.instant) DESC;
 END;
 $$;
 
