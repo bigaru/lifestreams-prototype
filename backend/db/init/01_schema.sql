@@ -49,14 +49,37 @@ CREATE INDEX IF NOT EXISTS idx_datastreams_individual_category_id ON datastreams
 
 
 -- Functions
-CREATE OR REPLACE FUNCTION last_7_days(page int, individual_id UUID, category_id BIGINT)
+CREATE OR REPLACE FUNCTION last(window_size varchar(1), page int, p_individual_id UUID, p_category_id BIGINT)
 RETURNS TABLE (
-    instant TIMESTAMPTZ, avg DOUBLE PRECISION, sum DOUBLE PRECISION, min DOUBLE PRECISION, max DOUBLE PRECISION
+    instant TIMESTAMPTZ, avg numeric, sum numeric, min numeric, max numeric
 )
-LANGUAGE sql
+LANGUAGE plpgsql
 AS $$
+DECLARE
+    lower_bound TIMESTAMPTZ;
+    upper_bound TIMESTAMPTZ;
+	sample_rate varchar(16);
+BEGIN
+    lower_bound := CASE window_size
+        WHEN 'y' THEN date_trunc('month', CURRENT_DATE) - (page * INTERVAL '1 year') - INTERVAL '11 months'
+        WHEN 'm' THEN CURRENT_DATE - (page * INTERVAL '4 week') - INTERVAL '3 weeks 6 days'
+        ELSE CURRENT_DATE - (page * INTERVAL '1 week') - INTERVAL '6 days'
+    END CASE;
+
+    upper_bound := CASE window_size
+        WHEN 'y' THEN date_trunc('month', CURRENT_DATE) - (page * INTERVAL '1 year') + INTERVAL '1 month'
+        WHEN 'm' THEN CURRENT_DATE - (page * INTERVAL '4 week') + INTERVAL '1 day'
+        ELSE CURRENT_DATE - (page * INTERVAL '1 week') + INTERVAL '1 day'
+    END CASE;
+
+    sample_rate := CASE window_size
+        WHEN 'y' THEN 'month'
+        ELSE 'day'
+    END CASE;
+
+    RETURN QUERY
 	SELECT
-		date_trunc('day', ds.created_at) AS instant,
+		date_trunc(sample_rate, ds.created_at) AS instant,
 		ROUND(AVG(ds.value)::numeric, 2),
 		ROUND(SUM(ds.value)::numeric, 2),
 		ROUND(MIN(ds.value)::numeric, 2),
@@ -64,60 +87,13 @@ AS $$
 	FROM datastreams ds
 	LEFT JOIN individual_categories icat ON ds.individual_category_id = icat.id
 	LEFT JOIN individual_devices idev ON icat.device_id = idev.id
-	WHERE ds.created_at >= CURRENT_DATE - (page * INTERVAL '1 week') - INTERVAL '6 days'
-		AND ds.created_at  < CURRENT_DATE - (page * INTERVAL '1 week') + INTERVAL '1 day'
-		AND idev.individual_id = individual_id
-		AND icat.category_id = category_id
-	GROUP BY instant
-	ORDER BY instant DESC
-$$;
-
-
-CREATE OR REPLACE FUNCTION last_4_weeks(page int, individual_id UUID, category_id BIGINT)
-RETURNS TABLE (
-    instant TIMESTAMPTZ, avg DOUBLE PRECISION, sum DOUBLE PRECISION, min DOUBLE PRECISION, max DOUBLE PRECISION
-)
-LANGUAGE sql
-AS $$
-	SELECT
-		date_trunc('day', ds.created_at) AS instant,
-		ROUND(AVG(ds.value)::numeric, 2),
-		ROUND(SUM(ds.value)::numeric, 2),
-		ROUND(MIN(ds.value)::numeric, 2),
-		ROUND(MAX(ds.value)::numeric, 2)
-	FROM datastreams ds
-	LEFT JOIN individual_categories icat ON ds.individual_category_id = icat.id
-	LEFT JOIN individual_devices idev ON icat.device_id = idev.id
-	WHERE ds.created_at >= CURRENT_DATE - (page * INTERVAL '4 week') - INTERVAL '3 weeks 6 days '
-		AND ds.created_at  < CURRENT_DATE - (page * INTERVAL '4 week') + INTERVAL '1 day'
-		AND idev.individual_id = individual_id
-		AND icat.category_id = category_id
-	GROUP BY instant
-	ORDER BY instant DESC;
-$$;
-
-
-CREATE OR REPLACE FUNCTION last_12_months(page int, individual_id UUID, category_id BIGINT)
-RETURNS TABLE (
-    instant TIMESTAMPTZ, avg DOUBLE PRECISION, sum DOUBLE PRECISION, min DOUBLE PRECISION, max DOUBLE PRECISION
-)
-LANGUAGE sql
-AS $$
-	SELECT
-		date_trunc('month', ds.created_at) AS instant,
-		ROUND(AVG(ds.value)::numeric, 2),
-		ROUND(SUM(ds.value)::numeric, 2),
-		ROUND(MIN(ds.value)::numeric, 2),
-		ROUND(MAX(ds.value)::numeric, 2)
-	FROM datastreams ds
-	LEFT JOIN individual_categories icat ON ds.individual_category_id = icat.id
-	LEFT JOIN individual_devices idev ON icat.device_id = idev.id
-	WHERE ds.created_at >= date_trunc('month', CURRENT_DATE) - (page * INTERVAL '1 year') - INTERVAL '11 months'
-		AND ds.created_at  < date_trunc('month', CURRENT_DATE) - (page * INTERVAL '1 year') + INTERVAL '1 month'
-		AND idev.individual_id = individual_id
-		AND icat.category_id = category_id
+	WHERE ds.created_at >= lower_bound
+		AND ds.created_at  < upper_bound
+		AND idev.individual_id = p_individual_id
+		AND icat.category_id = p_category_id
 	GROUP BY instant
 	ORDER BY instant DESC;
+END;
 $$;
 
 -- Views

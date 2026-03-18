@@ -12,10 +12,8 @@ class LastDatastreamRepository(
 ) {
 	fun fetchLast7Days(aggFn: String, page: Int, individualId: UUID, categoryId: Long): Flux<List<Any?>> {
 		return databaseClient
-			.sql("select instant, $aggFn from last_7_days(:page, :individualId, :categoryId)")
-			.bind("page", page)
+			.sql("select instant, $aggFn from last(7, $page, :individualId, $categoryId)")
 			.bind("individualId", individualId)
-			.bind("categoryId", categoryId)
 			.map { row, _ -> listOf(row.get("instant", Instant::class.java)!!, row.get(aggFn, Double::class.java)!!) }
 			.all() as Flux<List<Any?>>
 	}
