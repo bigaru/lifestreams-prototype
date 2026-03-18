@@ -51,7 +51,7 @@ CREATE INDEX IF NOT EXISTS idx_datastreams_individual_category_id ON datastreams
 -- Functions
 CREATE OR REPLACE FUNCTION last_7_days(page int, individual_id UUID, category_id BIGINT)
 RETURNS TABLE (
-    instant TIMESTAMPTZ, avg REAL, sum REAL, min REAL, max REAL
+    instant TIMESTAMPTZ, avg DOUBLE PRECISION, sum DOUBLE PRECISION, min DOUBLE PRECISION, max DOUBLE PRECISION
 )
 LANGUAGE sql
 AS $$
@@ -75,7 +75,7 @@ $$;
 
 CREATE OR REPLACE FUNCTION last_4_weeks(page int, individual_id UUID, category_id BIGINT)
 RETURNS TABLE (
-    instant TIMESTAMPTZ, avg REAL, sum REAL, min REAL, max REAL
+    instant TIMESTAMPTZ, avg DOUBLE PRECISION, sum DOUBLE PRECISION, min DOUBLE PRECISION, max DOUBLE PRECISION
 )
 LANGUAGE sql
 AS $$
@@ -99,7 +99,7 @@ $$;
 
 CREATE OR REPLACE FUNCTION last_12_months(page int, individual_id UUID, category_id BIGINT)
 RETURNS TABLE (
-    instant TIMESTAMPTZ, avg REAL, sum REAL, min REAL, max REAL
+    instant TIMESTAMPTZ, avg DOUBLE PRECISION, sum DOUBLE PRECISION, min DOUBLE PRECISION, max DOUBLE PRECISION
 )
 LANGUAGE sql
 AS $$

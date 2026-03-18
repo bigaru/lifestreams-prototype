@@ -4,7 +4,7 @@ LANGUAGE plpython3u
 AS $$
 import pandas as pd
 
-upper_bound = 3
+upper_bound = 11
 hrs = []
 
 for h in range(1,upper_bound+1):
@@ -13,7 +13,7 @@ for h in range(1,upper_bound+1):
 	hrs.append(df)
 
 today = pd.Timestamp.today().normalize()
-start_date = today - pd.DateOffset(months=13)
+start_date = today - pd.DateOffset(months=48)
 past_dates = pd.date_range(start=start_date, end=today, freq="D", tz="Europe/Zurich")
 dfs = []
 
