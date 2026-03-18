@@ -34,4 +34,15 @@ async function getOverview() {
 	return apiFetch('api/v1/datastreams/overview/d5412a03-1f23-4507-ace2-d9a342d41c93')
 }
 
-export { apiFetch, getOverview }
+type Window = 'DAY' | 'WEEK' | 'MONTH' | 'YEAR'
+
+async function getLast(page: number, categoryId: number, window: Window) {
+	const params = new URLSearchParams({
+		page: '' + page,
+		categoryId: '' + categoryId,
+		window: window,
+	})
+	return apiFetch(`api/v1/datastreams/last/d5412a03-1f23-4507-ace2-d9a342d41c93?${params.toString()}`)
+}
+
+export { apiFetch, getOverview, getLast }

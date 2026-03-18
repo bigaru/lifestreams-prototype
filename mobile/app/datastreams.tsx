@@ -1,9 +1,10 @@
+import * as API from '@/api/apiServer'
 import { ChartComponent } from '@/components/ChartComponent'
 import { useFocusEffect } from '@react-navigation/native'
 import { ChevronLeft, ChevronRight } from '@tamagui/lucide-icons'
 import { Stack, useLocalSearchParams } from 'expo-router'
 import * as ScreenOrientation from 'expo-screen-orientation'
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useWindowDimensions } from 'react-native'
 import { Button, Paragraph, XGroup, XStack, YStack } from 'tamagui'
 import useStore from '../store'
@@ -12,6 +13,12 @@ const formatOpt: Intl.DateTimeFormatOptions = {
 	weekday: 'short', // Mon
 	day: '2-digit', // 12
 	month: 'short', // Jan
+}
+
+function formatDate(page: number, step: string) {
+	const current = new Date()
+	current.setDate(current.getDate() - page)
+	return step === 'DAY' ? current.toLocaleDateString('de-CH', formatOpt) : ''
 }
 
 function createIndicators(id: number, data: { y: number }[]) {
@@ -31,6 +38,13 @@ function createIndicators(id: number, data: { y: number }[]) {
 	}
 }
 
+const stepLevelByKey: Record<string, string> = {
+	DAY: '1d',
+	WEEK: '7d',
+	MONTH: '4w',
+	YEAR: '1y',
+}
+
 export default function () {
 	const { first, second = '' } = useLocalSearchParams<{ first: string; second: string }>()
 	const { width, height } = useWindowDimensions()
@@ -39,6 +53,18 @@ export default function () {
 	const firstId = Number(first ?? 0)
 	const secondId = Number(second ?? 0)
 	const isComparison = !!(firstId && secondId)
+
+	const [selectedStep, setStep] = useState('DAY')
+	const [page, setPage] = useState(0)
+
+	const setDatastreams = useStore((state) => state.setDatastreams)
+
+	useEffect(() => {
+		API.getLast(page, firstId, selectedStep as any).then((data) => setDatastreams(firstId, data))
+	}, [firstId, page, selectedStep])
+	useEffect(() => {
+		API.getLast(page, secondId, selectedStep as any).then((data) => setDatastreams(secondId, data))
+	}, [secondId, page, selectedStep])
 
 	useFocusEffect(
 		useCallback(() => {
@@ -66,10 +92,7 @@ export default function () {
 		domain: secondDomain,
 	} = useStore((state) => state.overviews.find((i) => i.id === secondId)) ?? { unit: '', color: 'black', domain: [0, 100] }
 
-	const [selectedStep, setStep] = useState('1d')
-	const [selectedDate, setDate] = useState(new Date())
-
-	const steps = ['1d', '7d', '4w', '1y']
+	const steps = Object.keys(stepLevelByKey)
 	const performanceIndicators = createIndicators(firstId, firstData)
 
 	return (
@@ -80,7 +103,7 @@ export default function () {
 					{steps.map((s) => (
 						<XGroup.Item key={s}>
 							<Button width="25%" mx={0} borderWidth={0} size="$3" theme={selectedStep === s ? 'accent' : null} onPress={() => setStep(s)}>
-								{s}
+								{stepLevelByKey[s]}
 							</Button>
 						</XGroup.Item>
 					))}
@@ -89,9 +112,9 @@ export default function () {
 			<YStack bg="white" flex={1}>
 				{!isLandscape && (
 					<XStack justify="space-between" items="center">
-						<Button icon={ChevronLeft} chromeless />
-						<Paragraph>{selectedDate.toLocaleDateString('de-CH', formatOpt)}</Paragraph>
-						<Button icon={ChevronRight} chromeless />
+						<Button icon={ChevronLeft} chromeless onPress={() => setPage(page + 1)} />
+						<Paragraph>{formatDate(page, selectedStep)}</Paragraph>
+						<Button icon={ChevronRight} chromeless onPress={() => setPage(page - 1)} />
 					</XStack>
 				)}
 				{!isLandscape && !isComparison && (

@@ -8,16 +8,7 @@ import inter from '../assets/inter-medium.ttf'
 type Point = { x: number; y: number }
 type MultiPoint = { x: number; y1?: number; y2?: number }
 
-function minSinceMidnight(millisec: number) {
-	const d = new Date(millisec)
-	const midnight = new Date(d.getFullYear(), d.getMonth(), d.getDate())
-	return Math.floor((millisec - midnight.getTime()) / (60 * 1000))
-}
-
 function zipAlongXCoord(a: Point[], b: Point[]): MultiPoint[] {
-	a = a.map((e) => ({ ...e, x: minSinceMidnight(e.x) }))
-	b = b.map((e) => ({ ...e, x: minSinceMidnight(e.x) }))
-
 	const ma = new Map(a.map((p) => [p.x, p.y] as const))
 	const mb = new Map(b.map((p) => [p.x, p.y] as const))
 	const xs = new Set([...a.map((p) => p.x), ...b.map((p) => p.x)])
@@ -88,22 +79,23 @@ function SingleChart(props: ChartProps) {
 		return n.toFixed(0)
 	})
 	const realingedX = useDerivedValue(() => state.x.position.value - 12)
-	const mappedData = data[0].map((e) => ({ ...e, x: minSinceMidnight(e.x) }))
 
 	return (
 		<>
 			<CartesianChart
-				data={mappedData}
-				domain={{ x: X_DOMAIN_DAY, y: domain[0] }}
+				data={data[0]}
+				domain={{ y: domain[0] }}
 				padding={{ top: 30 }}
 				xKey={'x'}
 				yKeys={['y']}
 				yAxis={[{ font: font }]}
-				xAxis={{
-					font: font,
-					formatXLabel: (min) => String(Math.floor(min / 60)).padStart(2, '0'),
-					tickCount: 8,
-				}}
+				xAxis={
+					{
+						//font: font,
+						//formatXLabel: (min) => String(Math.floor(min / 60)).padStart(2, '0'),
+						//tickCount: 8,
+					}
+				}
 				chartPressState={state}
 				transformConfig={{ pan: { enabled: false, dimensions: ['x'] }, pinch: { enabled: false, dimensions: ['x'] } }}
 				transformState={transformState}

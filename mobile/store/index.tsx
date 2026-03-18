@@ -20,6 +20,7 @@ interface State {
 	overviews: DatastreamOverview[]
 	datastreamsById: Record<number, { x: number; y: number }[]>
 	setOverviews: (newData: DatastreamOverview[]) => void
+	setDatastreams: (id: number, newData: [number, number][]) => void
 }
 
 const hr1 = hr1Data.map(([x, y]) => ({ x, y }))
@@ -83,8 +84,13 @@ const initialData = [
 
 const useStore = create<State>((set) => ({
 	overviews: initialData,
-	datastreamsById: { 1: hr1, 2: step1, 3: hr2, 4: step2 },
+	datastreamsById: { 1: hr1, 2: step1, 3: hr2, 4: step2 } as any,
 	setOverviews: (newData: DatastreamOverview[]) => set((state) => ({ ...state, overviews: newData })),
+	setDatastreams: (id: number, newData: [number, number][]) =>
+		set((state) => {
+			const dateValueTuples = newData.map(([x, y]) => ({ x, y }))
+			return { ...state, datastreamsById: { ...state.datastreamsById, [id]: dateValueTuples } }
+		}),
 }))
 
 export default useStore

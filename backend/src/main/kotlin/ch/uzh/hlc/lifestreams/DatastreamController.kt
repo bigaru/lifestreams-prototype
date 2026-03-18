@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.web.bind.annotation.*
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
+import java.time.Instant
 import java.util.*
 
 
@@ -41,6 +42,6 @@ class DatastreamController(
 		@RequestParam categoryId: Long,
 		@RequestParam window: WindowSize
 	): Flux<List<Any?>> {
-		return lastRepo.fetchLastData(window, "avg", page, individualId, categoryId)
+		return lastRepo.fetchLastData(window, "avg", page, individualId, categoryId).map { listOf((it[0] as Instant).toEpochMilli(), it[1]) }
 	}
 }

@@ -26,7 +26,7 @@ const noop = () => {}
 
 export default function () {
 	useEffect(() => {
-		//API.getOverview().then(setOverviews)
+		API.getOverview().then(setOverviews)
 	}, [])
 	const router = useRouter()
 	const { overviews, setOverviews } = useStore()
