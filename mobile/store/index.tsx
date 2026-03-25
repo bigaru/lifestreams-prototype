@@ -39,6 +39,14 @@ function accumulateSteps(data: any[]) {
 const step1 = accumulateSteps(step1Data)
 const step2 = accumulateSteps(step2Data)
 
+const mergeById = (arr1: any, arr2: any) => {
+	const map = new Map(arr1.map((item: any) => [item.id, item]))
+	arr2.forEach((item: any) => {
+		map.set(item.id, { ...(map.get(item.id) || {}), ...item })
+	})
+	return Array.from(map.values())
+}
+
 const initialData = [
 	{
 		id: 1,
@@ -48,7 +56,7 @@ const initialData = [
 		classes: ['Health', 'Heart'],
 		createdAt: new Date().toISOString(),
 		color: 'red',
-		domain: [20, 220],
+		domain: [0, 220],
 	},
 	{
 		id: 2,
@@ -85,7 +93,7 @@ const initialData = [
 const useStore = create<State>((set) => ({
 	overviews: initialData,
 	datastreamsById: { 1: hr1, 2: step1, 3: hr2, 4: step2 } as any,
-	setOverviews: (newData: DatastreamOverview[]) => set((state) => ({ ...state, overviews: newData })),
+	setOverviews: (newData: DatastreamOverview[]) => set((state) => ({ ...state, overviews: mergeById(state.overviews, newData) as any })),
 	setDatastreams: (id: number, newData: [number, number][]) =>
 		set((state) => {
 			const dateValueTuples = newData.map(([x, y]) => ({ x, y }))

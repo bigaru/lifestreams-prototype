@@ -6,19 +6,63 @@ import { Stack, useLocalSearchParams } from 'expo-router'
 import * as ScreenOrientation from 'expo-screen-orientation'
 import { useCallback, useEffect, useState } from 'react'
 import { useWindowDimensions } from 'react-native'
-import { Button, Paragraph, XGroup, XStack, YStack } from 'tamagui'
+import { Button, Paragraph, View, XGroup, XStack, YStack } from 'tamagui'
 import useStore from '../store'
 
-const formatOpt: Intl.DateTimeFormatOptions = {
-	weekday: 'short', // Mon
-	day: '2-digit', // 12
-	month: 'short', // Jan
+const formatWithWeekDay: Intl.DateTimeFormatOptions = {
+	weekday: 'short',
+	day: '2-digit',
+	month: 'short',
+}
+const formatDay: Intl.DateTimeFormatOptions = {
+	day: '2-digit',
+	month: 'short',
+}
+const formatDayWithYear: Intl.DateTimeFormatOptions = {
+	month: 'short',
+	year: 'numeric',
 }
 
 function formatDate(page: number, step: string) {
 	const current = new Date()
-	current.setDate(current.getDate() - page)
-	return step === 'DAY' ? current.toLocaleDateString('de-CH', formatOpt) : ''
+	const begin = new Date()
+	let beginText = ''
+	let endText = ''
+
+	if (step === 'DAY') {
+		current.setDate(current.getDate() - page)
+		return current.toLocaleDateString('de-CH', formatWithWeekDay)
+	}
+	if (step === 'WEEK') {
+		begin.setDate(begin.getDate() - page * 7 - 6)
+		current.setDate(current.getDate() - page * 7)
+		beginText = begin.toLocaleDateString('de-CH', formatDay)
+		endText = current.toLocaleDateString('de-CH', formatDay)
+		return `${beginText} - ${endText}`
+	}
+	if (step === 'MONTH') {
+		begin.setDate(begin.getDate() - page * 28 - 27)
+		current.setDate(current.getDate() - page * 28)
+		beginText = begin.toLocaleDateString('de-CH', formatDay)
+		endText = current.toLocaleDateString('de-CH', formatDay)
+		return `${beginText} - ${endText}`
+	}
+	if (step === 'YEAR') {
+		begin.setFullYear(begin.getFullYear() - page - 1)
+		begin.setMonth(begin.getMonth() - 1)
+		current.setFullYear(current.getFullYear() - page)
+		beginText = begin.toLocaleDateString('de-CH', formatDayWithYear)
+		endText = current.toLocaleDateString('de-CH', formatDayWithYear)
+		return `${beginText} - ${endText}`
+	}
+
+	return ''
+}
+
+function isTomorrow(page: number) {
+	const next = new Date()
+	next.setDate(next.getDate() - page + 1)
+	return next > new Date()
 }
 
 function createIndicators(id: number, data: { y: number }[]) {
@@ -26,8 +70,8 @@ function createIndicators(id: number, data: { y: number }[]) {
 		case 1:
 		case 3:
 			return [
-				{ title: 'resting', value: Math.min(...data.map((e) => e.y)) },
-				{ title: 'high', value: Math.max(...data.map((e) => e.y)) },
+				{ title: 'resting', value: Math.round(Math.min(...data.map((e) => e.y))) },
+				{ title: 'high', value: Math.round(Math.max(...data.map((e) => e.y))) },
 			]
 		case 2:
 		case 4:
@@ -65,6 +109,8 @@ export default function () {
 	useEffect(() => {
 		API.getLast(page, secondId, selectedStep as any).then((data) => setDatastreams(secondId, data))
 	}, [secondId, page, selectedStep])
+
+	useEffect(() => setPage(0), [selectedStep])
 
 	useFocusEffect(
 		useCallback(() => {
@@ -112,9 +158,9 @@ export default function () {
 			<YStack bg="white" flex={1}>
 				{!isLandscape && (
 					<XStack justify="space-between" items="center">
-						<Button icon={ChevronLeft} chromeless onPress={() => setPage(page + 1)} />
+						<Button width={50} icon={ChevronLeft} chromeless onPress={() => setPage(page + 1)} />
 						<Paragraph>{formatDate(page, selectedStep)}</Paragraph>
-						<Button icon={ChevronRight} chromeless onPress={() => setPage(page - 1)} />
+						{isTomorrow(page) ? <View width={50} /> : <Button width={50} icon={ChevronRight} chromeless onPress={() => setPage(page - 1)} />}
 					</XStack>
 				)}
 				{!isLandscape && !isComparison && (
