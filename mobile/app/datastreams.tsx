@@ -9,21 +9,11 @@ import { useWindowDimensions } from 'react-native'
 import { Button, Paragraph, View, XGroup, XStack, YStack } from 'tamagui'
 import useStore from '../store'
 
-const formatWithWeekDay: Intl.DateTimeFormatOptions = {
-	weekday: 'short',
-	day: '2-digit',
-	month: 'short',
-}
-const formatDay: Intl.DateTimeFormatOptions = {
-	day: '2-digit',
-	month: 'short',
-}
-const formatDayWithYear: Intl.DateTimeFormatOptions = {
-	month: 'short',
-	year: 'numeric',
-}
+const formatWithWeekDay: Intl.DateTimeFormatOptions = { weekday: 'short', day: '2-digit', month: 'short' }
+const formatDay: Intl.DateTimeFormatOptions = { day: '2-digit', month: 'short' }
+const formatDayWithYear: Intl.DateTimeFormatOptions = { month: 'short', year: 'numeric' }
 
-function formatDate(page: number, step: string) {
+function formatDate(page: number, step: WINDOW_KEY) {
 	const current = new Date()
 	const begin = new Date()
 	let beginText = ''
@@ -31,21 +21,19 @@ function formatDate(page: number, step: string) {
 
 	if (step === 'DAY') {
 		current.setDate(current.getDate() - page)
-		return current.toLocaleDateString('de-CH', formatWithWeekDay)
+		beginText = current.toLocaleDateString('de-CH', formatWithWeekDay)
 	}
 	if (step === 'WEEK') {
 		begin.setDate(begin.getDate() - page * 7 - 6)
 		current.setDate(current.getDate() - page * 7)
 		beginText = begin.toLocaleDateString('de-CH', formatDay)
 		endText = current.toLocaleDateString('de-CH', formatDay)
-		return `${beginText} - ${endText}`
 	}
 	if (step === 'MONTH') {
 		begin.setDate(begin.getDate() - page * 28 - 27)
 		current.setDate(current.getDate() - page * 28)
 		beginText = begin.toLocaleDateString('de-CH', formatDay)
 		endText = current.toLocaleDateString('de-CH', formatDay)
-		return `${beginText} - ${endText}`
 	}
 	if (step === 'YEAR') {
 		begin.setFullYear(begin.getFullYear() - page - 1)
@@ -53,10 +41,8 @@ function formatDate(page: number, step: string) {
 		current.setFullYear(current.getFullYear() - page)
 		beginText = begin.toLocaleDateString('de-CH', formatDayWithYear)
 		endText = current.toLocaleDateString('de-CH', formatDayWithYear)
-		return `${beginText} - ${endText}`
 	}
-
-	return ''
+	return endText ? `${beginText} - ${endText}` : beginText
 }
 
 function isTomorrow(page: number) {
@@ -82,7 +68,8 @@ function createIndicators(id: number, data: { y: number }[]) {
 	}
 }
 
-const stepLevelByKey: Record<string, string> = {
+export type WINDOW_KEY = 'DAY' | 'WEEK' | 'MONTH' | 'YEAR'
+const stepLevelByKey: Record<WINDOW_KEY, string> = {
 	DAY: '1d',
 	WEEK: '7d',
 	MONTH: '4w',
@@ -98,7 +85,7 @@ export default function () {
 	const secondId = Number(second ?? 0)
 	const isComparison = !!(firstId && secondId)
 
-	const [selectedStep, setStep] = useState('DAY')
+	const [selectedStep, setStep] = useState<WINDOW_KEY>('DAY')
 	const [page, setPage] = useState(0)
 
 	const setDatastreams = useStore((state) => state.setDatastreams)
@@ -138,7 +125,7 @@ export default function () {
 		domain: secondDomain,
 	} = useStore((state) => state.overviews.find((i) => i.id === secondId)) ?? { unit: '', color: 'black', domain: [0, 100] }
 
-	const steps = Object.keys(stepLevelByKey)
+	const steps = Object.keys(stepLevelByKey) as WINDOW_KEY[]
 	const performanceIndicators = createIndicators(firstId, firstData)
 
 	return (
@@ -189,6 +176,7 @@ export default function () {
 					color={[firstColor, secondColor]}
 					data={[firstData, secondData]}
 					domain={[firstDomain, secondDomain] as any}
+					selectedWindow={selectedStep}
 				/>
 			</YStack>
 		</>

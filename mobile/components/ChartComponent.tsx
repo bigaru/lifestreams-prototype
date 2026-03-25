@@ -1,9 +1,10 @@
 import { Circle, Line as SkiaLine, Text as SkiaText, useFont } from '@shopify/react-native-skia'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useDerivedValue } from 'react-native-reanimated'
 import { View, YStack, type ViewProps } from 'tamagui'
 import { CartesianChart, Line, useChartPressState, useChartTransformState } from 'victory-native'
 import inter from '../assets/inter-medium.ttf'
+import { WINDOW_KEY } from '@/app/datastreams'
 
 type Point = { x: number; y: number }
 type MultiPoint = { x: number; y1?: number; y2?: number }
@@ -16,11 +17,46 @@ function zipAlongXCoord(a: Point[], b: Point[]): MultiPoint[] {
 	return [...xs].sort().map((x) => ({ x, y1: ma.get(x), y2: mb.get(x) }))
 }
 
+const formatDay: Intl.DateTimeFormatOptions = { hour: '2-digit' }
+
+function formatDate(window: WINDOW_KEY, timestamp: number) {
+	if (window === 'DAY') {
+		return new Date(timestamp).getHours().toString().padStart(2, '0')
+	}
+	if (window === 'WEEK') {
+		return new Date(timestamp).toLocaleDateString('de-CH', { day: '2-digit' })
+	}
+	if (window === 'MONTH') {
+		return new Date(timestamp).toLocaleDateString('de-CH', { day: '2-digit' })
+	}
+	if (window === 'YEAR') {
+		return new Date(timestamp).toLocaleDateString('de-CH', { month: '2-digit' })
+	}
+	return ''
+}
+
+function getTicksCount(window: WINDOW_KEY, data: any[]) {
+	if (window === 'DAY') {
+		return 7
+	}
+	if (window === 'WEEK') {
+		return data.length
+	}
+	if (window === 'MONTH') {
+		return data.length / 2
+	}
+	if (window === 'YEAR') {
+		return data.length
+	}
+	return data.length
+}
+
 interface ChartProps {
 	color: string[]
 	data: Point[][]
 	unit: string[]
 	domain: [number, number][]
+	selectedWindow: WINDOW_KEY
 }
 
 type ChartWrapperProps = { isComparison: boolean } & ChartProps & ViewProps
@@ -42,15 +78,15 @@ function findClosestPoint(data: MultiPoint[], targetX: number): MultiPoint | nul
 }
 
 export function ChartComponent(props: ChartWrapperProps) {
-	const { isComparison, unit, color, data, domain, ...ViewProps } = props
+	const { isComparison, unit, color, data, domain, selectedWindow, ...ViewProps } = props
 
 	return (
 		<YStack items="center" justify="center" flex={1}>
 			<View flex={1} {...ViewProps}>
 				{isComparison ? (
-					<DualAxisChart unit={unit} color={color} data={data} domain={domain} />
+					<DualAxisChart unit={unit} color={color} data={data} domain={domain} selectedWindow={selectedWindow} />
 				) : (
-					<SingleChart unit={unit} color={color} data={data} domain={domain} />
+					<SingleChart unit={unit} color={color} data={data} domain={domain} selectedWindow={selectedWindow} />
 				)}
 			</View>
 		</YStack>
@@ -58,7 +94,7 @@ export function ChartComponent(props: ChartWrapperProps) {
 }
 
 function SingleChart(props: ChartProps) {
-	const { color, data, unit, domain } = props
+	const { color, data, unit, domain, selectedWindow } = props
 	const font = useFont(inter, 12)
 	const fontTooltip = useFont(inter, 18)
 
@@ -89,13 +125,12 @@ function SingleChart(props: ChartProps) {
 				xKey={'x'}
 				yKeys={['y']}
 				yAxis={[{ font: font }]}
-				xAxis={
-					{
-						//font: font,
-						//formatXLabel: (min) => String(Math.floor(min / 60)).padStart(2, '0'),
-						//tickCount: 8,
-					}
-				}
+				xAxis={{
+					font: font,
+					formatXLabel: (ts) => formatDate(selectedWindow, ts),
+					tickCount: getTicksCount(selectedWindow, data[0]),
+					tickValues: data[0].map((d) => d.x),
+				}}
 				chartPressState={state}
 				transformConfig={{ pan: { enabled: false, dimensions: ['x'] }, pinch: { enabled: false, dimensions: ['x'] } }}
 				transformState={transformState}
