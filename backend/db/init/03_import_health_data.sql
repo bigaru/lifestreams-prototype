@@ -3,6 +3,7 @@ RETURNS void
 LANGUAGE plpython3u
 AS $$
 import pandas as pd
+import numpy as np
 
 upper_bound = 11
 hrs = []
@@ -17,9 +18,13 @@ start_date = today - pd.DateOffset(months=48)
 past_dates = pd.date_range(start=start_date, end=today, freq="D", tz="Europe/Zurich")
 dfs = []
 
-for day in past_dates:
-	idx = day.weekday() % upper_bound
-	hr_df = hrs[idx].copy()
+weights = np.array([10, 10, 1, 10, 10, 10, 6, 10, 10, 3, 10])
+weights = weights/weights.sum()
+rand_indices = np.random.choice(len(hrs), p=weights, size=len(past_dates))
+
+for idx, day in enumerate(past_dates):
+	selected_idx = rand_indices[idx]
+	hr_df = hrs[selected_idx].copy()
 	hr_df[0] = day + (hr_df[0] - hr_df[0].dt.normalize())
 	dfs.append(hr_df)
 
