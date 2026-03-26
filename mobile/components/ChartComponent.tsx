@@ -61,8 +61,6 @@ interface ChartProps {
 
 type ChartWrapperProps = { isComparison: boolean } & ChartProps & ViewProps
 
-const X_DOMAIN_DAY: [number, number] = [0, 24 * 60]
-
 function findClosestPoint(data: MultiPoint[], targetX: number): MultiPoint | null {
 	'worklet'
 	if (!data.length || data[data.length - 1].x < targetX) return null
@@ -167,6 +165,7 @@ function DualAxisChart(props: ChartProps) {
 		data: [firstData, secondData],
 		unit,
 		domain,
+		selectedWindow,
 	} = props
 	const font = useFont(inter, 12)
 	const fontTooltip = useFont(inter, 18)
@@ -207,7 +206,6 @@ function DualAxisChart(props: ChartProps) {
 		<>
 			<CartesianChart
 				data={zippedData}
-				domain={{ x: X_DOMAIN_DAY }}
 				padding={{ top: 50 }}
 				xKey={'x'}
 				yKeys={['y1', 'y2']}
@@ -217,8 +215,9 @@ function DualAxisChart(props: ChartProps) {
 				]}
 				xAxis={{
 					font: font,
-					formatXLabel: (min) => String(Math.floor(min / 60)).padStart(2, '0'),
-					tickCount: 8,
+					formatXLabel: (ts) => formatDate(selectedWindow, ts),
+					tickCount: getTicksCount(selectedWindow, zippedData),
+					tickValues: zippedData.map((d) => d.x),
 				}}
 				chartPressState={state}
 				transformConfig={{ pan: { enabled: false, dimensions: ['x'] }, pinch: { enabled: false, dimensions: ['x'] } }}
