@@ -12,10 +12,8 @@ import java.util.*
 
 @Table("datastream_overview")
 data class DatastreamOverview(
-	@Id val id: Long,
 	val createdAt: Instant,
 	val value: Double,
-	val categoryId: Long,
 	val categoryDescription: String,
 	val classes: List<String>,
 	val unit: String,
