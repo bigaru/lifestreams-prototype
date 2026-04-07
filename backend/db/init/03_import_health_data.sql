@@ -14,7 +14,7 @@ for h in range(1,upper_bound+1):
 	hrs.append(df)
 
 today = pd.Timestamp.today().normalize()
-start_date = today - pd.DateOffset(months=48)
+start_date = today - pd.DateOffset(months=18)
 past_dates = pd.date_range(start=start_date, end=today, freq="D", tz="Europe/Zurich")
 dfs = []
 
@@ -33,11 +33,11 @@ final_df[0] = final_df[0].dt.to_pydatetime()
 
 plan = plpy.prepare(
     "INSERT INTO datastreams (individual_category_id, created_at, value) VALUES ($1, $2, $3)",
-    ["bigint", "timestamptz", "double precision"]
+    ["uuid", "timestamptz", "double precision"]
 )
 
 for row in final_df.itertuples(index=False):
-    plpy.execute(plan, [1, row[0], row[1]])
+    plpy.execute(plan, ['aca1d946-d481-4a77-928e-b172dd535e44', row[0], row[1]])
 $$;
 
 
