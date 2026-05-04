@@ -1,0 +1,33 @@
+server.port: ${APP_PORT:8080}
+
+spring:
+  application:
+    name: lifestreams
+
+  r2dbc:
+    url: ${APP_DB_URL:r2dbc:postgresql://pginstance:5432/lifestreams_db}
+    username: ${APP_DB_USERNAME:postgres}
+    password: ${APP_DB_PASSWORD:postgres}
+
+  security:
+    oauth2:
+      client:
+        registration:
+          google-health:
+            client-id: ${client-id}
+            client-secret: ${client-secret}
+            authorization-grant-type: authorization_code
+            redirect-uri: "{baseUrl}/login/oauth2/code/google-health"
+            scope:
+              - https://www.googleapis.com/auth/googlehealth.activity_and_fitness.readonly
+              - https://www.googleapis.com/auth/googlehealth.health_metrics_and_measurements.readonly
+              - https://www.googleapis.com/auth/googlehealth.nutrition.readonly
+              - https://www.googleapis.com/auth/googlehealth.sleep.readonly
+            client-name: Google Health API
+
+        provider:
+          google-health:
+            authorization-uri: https://accounts.google.com/o/oauth2/auth
+            token-uri: https://oauth2.googleapis.com/token
+            user-info-uri: https://www.googleapis.com/oauth2/v3/userinfo
+            jwk-set-uri: https://www.googleapis.com/oauth2/v3/certs
