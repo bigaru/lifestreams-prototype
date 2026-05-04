@@ -12,7 +12,7 @@ import java.util.*
 
 @Table("datastream_overview")
 data class DatastreamOverview(
-	@Id val id: Long,
+	@Id val id: UUID,
 	val createdAt: Instant,
 	val value: Double,
 	val categoryId: Long,
