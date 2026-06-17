@@ -22,7 +22,18 @@ see https://docs.spring.io/spring-boot/gradle-plugin/packaging-oci-image.html
 ```bash
 ./gradlew bootBuildImage --imageName=ghcr.io/bigaru/lifestreams-prototype:0.0.1
 ```
+### Mock Data
+For imports in `backend/db/init/03_import_health_data.sql`,  files should be located under `backend/db/init/data/(hr1.json)`.
 
+```json
+// hr1.json
+[
+	[1771628400000, 60],
+	[1771628520000, 60],
+	...
+	[1771714680000, 58]
+]
+```
 
 ## Web
 Requirements:
@@ -59,4 +70,31 @@ cd android
 ./gradlew assembleRelease
 
 adb install -r app/build/outputs/apk/release/app-release.apk
+```
+
+### Mock Data
+For imports in `mobile/store/index.tsx`,  files should be located under `mobile/data/(hr1.json|step1.json)`.
+
+```json
+// hr1.json
+[
+	[1771628400000, 60],
+	[1771628520000, 60],
+	...
+	[1771714680000, 58]
+]
+```
+```json
+// step1.json
+[
+	{
+		"startGMT": "2026-02-22T23:00:00.0",
+		"endGMT": "2026-02-22T23:15:00.0",
+		"steps": 0,
+		"pushes": 0,
+		"primaryActivityLevel": "sleeping",
+		"activityLevelConstant": true
+	},
+	...
+]
 ```
