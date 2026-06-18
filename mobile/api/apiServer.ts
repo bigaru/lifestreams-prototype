@@ -45,4 +45,8 @@ async function getLast(page: number, categoryId: number, window: Window) {
 	return apiFetch(`api/v1/datastreams/last/d5412a03-1f23-4507-ace2-d9a342d41c93?${params.toString()}`)
 }
 
-export { apiFetch, getOverview, getLast }
+async function getRequests() {
+	return apiFetch('api/v1/datastreams/requests') as Promise<{ name: string; description: string }[]>
+}
+
+export { apiFetch, getOverview, getLast, getRequests }

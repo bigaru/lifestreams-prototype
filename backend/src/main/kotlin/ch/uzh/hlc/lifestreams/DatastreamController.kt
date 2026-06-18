@@ -8,12 +8,17 @@ import kotlinx.coroutines.flow.Flow
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import java.time.Instant
 import java.util.*
 
+data class ProjectRequest(
+	val name: String,
+	val description: String
+)
 
 @RestController
 @RequestMapping("/api/v1/datastreams")
@@ -21,6 +26,7 @@ class DatastreamController(
 	@Value($$"${spring.application.name}") val appName: String,
 	private val overviewRepo: DatastreamOverviewRepository,
 	private val lastRepo: LastDatastreamRepository,
+	private val projects: MutableList<ProjectRequest>
 ) {
 	companion object {
 		val log: Logger = LoggerFactory.getLogger(DatastreamController::class.java)
@@ -43,5 +49,18 @@ class DatastreamController(
 		@RequestParam window: WindowSize
 	): Flux<List<Any?>> {
 		return lastRepo.fetchLastData(window, "avg", page, individualId, categoryId).map { listOf((it[0] as Instant).toEpochMilli(), it[1]) }
+	}
+
+	@PostMapping("/requests")
+	@ResponseStatus(HttpStatus.CREATED)
+	fun postRequest(@RequestBody request: Mono<ProjectRequest>): Mono<Void> {
+		return request.doOnNext { p ->
+			projects.addLast(p)
+		}.then()
+	}
+
+	@GetMapping("/requests")
+	fun getRequest(): Mono<List<ProjectRequest>> {
+		return Mono.just(projects)
 	}
 }

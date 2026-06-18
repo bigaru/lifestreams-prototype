@@ -24,6 +24,14 @@ const products = [
 
 const itemsBody = (row: any) => (row.category ?? []).join(', ')
 
+function sendRequest(project: string, description: string) {
+	return fetch('/api/v1/datastreams/requests', {
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify({ name: project, description }),
+	})
+}
+
 export default function () {
 	const maxDays = Math.max(...products.map((e) => e.q))
 
@@ -100,7 +108,17 @@ export default function () {
 						rows={10}
 						cols={30}
 					/>
-					<PRButton label="Request" disabled={!project || !description} />
+					<PRButton
+						label="Request"
+						disabled={!project || !description}
+						onClick={() =>
+							sendRequest(project, description).then(() => {
+								setDescription('')
+								setProject(null)
+								setVisible(false)
+							})
+						}
+					/>
 				</YStack>
 			</Dialog>
 		</>

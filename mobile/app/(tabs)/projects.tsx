@@ -17,7 +17,7 @@ export default function () {
 						py="$6"
 						borderRadius="$radius.6"
 						onPress={() => {
-							router.push({ pathname: `/datastreams`, params: { first: item, second: '' } })
+							router.push({ pathname: `/consent`, params: { first: item } })
 						}}
 					>
 						<Paragraph size="$8" fontWeight="800">

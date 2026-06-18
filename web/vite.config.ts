@@ -23,4 +23,12 @@ export default defineConfig({
 			'@lifestreams/shared': path.resolve(__dirname, '../shared/src'),
 		},
 	},
+	server: {
+		proxy: {
+			'/api': {
+				target: 'http://localhost:8080',
+				changeOrigin: true,
+			},
+		},
+	},
 })
