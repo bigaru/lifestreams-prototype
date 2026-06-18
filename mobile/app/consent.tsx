@@ -1,7 +1,7 @@
 import * as API from '@/api/apiServer'
 import { useRouter } from 'expo-router'
 import { useEffect, useState } from 'react'
-import { Button, Card, H3, Paragraph, ScrollView, Sheet, XStack, YStack } from 'tamagui'
+import { Button, Card, H3, Paragraph, ScrollView, Sheet, XStack, YStack, Text } from 'tamagui'
 import { Stack, useLocalSearchParams } from 'expo-router'
 
 function trimDescription(text: string) {
@@ -18,10 +18,23 @@ export default function () {
 		API.getRequests().then(setOverviews)
 	}, [])
 	const router = useRouter()
-	const [overviews, setOverviews] = useState<{ name: string; description: string }[]>([])
+	const [overviews, setOverviews] = useState<{ name: string; description: string; dataTypes: string[] }[]>([])
 	const [pos, setPos] = useState<number>()
 
 	const { first } = useLocalSearchParams<{ first: string }>()
+
+	if (first !== 'Requests') {
+		return (
+			<>
+				<Stack.Screen options={{ title: first }} />
+				<YStack items="center" justify="center" flex={1}>
+					<H3 size="$6" fontWeight="800">
+						Under construction
+					</H3>
+				</YStack>
+			</>
+		)
+	}
 
 	return (
 		<>
@@ -38,6 +51,9 @@ export default function () {
 								</XStack>
 								<XStack gap="$1" justify="space-between">
 									<Paragraph>{trimDescription(item.description)}</Paragraph>
+								</XStack>
+								<XStack gap="$1">
+									<Paragraph>{item.dataTypes.join(', ')}</Paragraph>
 								</XStack>
 							</YStack>
 						</Card>
@@ -56,10 +72,22 @@ export default function () {
 				<Sheet.Handle />
 				<Sheet.Frame>
 					<YStack gap="$3" p="$5">
-						<Paragraph size="$8" fontWeight="800">
-							{pos != null ? overviews[pos].name : ''}
-						</Paragraph>
-						<Paragraph>{pos != null ? overviews[pos].description : ''}</Paragraph>
+						{pos != null ? (
+							<>
+								<Paragraph size="$8" fontWeight="800">
+									{overviews[pos!].name}
+								</Paragraph>
+								<Paragraph>{overviews[pos!].description}</Paragraph>
+
+								<XStack gap="$2" flexWrap="wrap">
+									<Paragraph>The project requires:</Paragraph>
+									{overviews[pos!].dataTypes.map((d) => (
+										<LabelChip key={d} label={d} />
+									))}
+								</XStack>
+							</>
+						) : null}
+
 						<Button size="$5" theme="blue">
 							I consent
 						</Button>
@@ -73,5 +101,24 @@ export default function () {
 				</Sheet.Frame>
 			</Sheet>
 		</>
+	)
+}
+
+function LabelChip({ label }: { label: string }) {
+	return (
+		<XStack
+			items="center"
+			borderTopRightRadius="$10"
+			borderTopLeftRadius="$10"
+			borderBottomRightRadius="$10"
+			borderBottomLeftRadius="$10"
+			px="$3"
+			py="$1"
+			background="$backgroundPress"
+			borderWidth={1}
+			borderColor="$borderColor"
+		>
+			<Text fontSize="$2">{label}</Text>
+		</XStack>
 	)
 }

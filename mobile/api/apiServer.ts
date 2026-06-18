@@ -46,7 +46,7 @@ async function getLast(page: number, categoryId: number, window: Window) {
 }
 
 async function getRequests() {
-	return apiFetch('api/v1/datastreams/requests') as Promise<{ name: string; description: string }[]>
+	return apiFetch('api/v1/datastreams/requests') as Promise<{ name: string; description: string; dataTypes: string[] }[]>
 }
 
 export { apiFetch, getOverview, getLast, getRequests }

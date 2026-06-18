@@ -17,7 +17,8 @@ import java.util.*
 
 data class ProjectRequest(
 	val name: String,
-	val description: String
+	val description: String,
+	val dataTypes: List<String>
 )
 
 @RestController

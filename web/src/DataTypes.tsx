@@ -24,11 +24,11 @@ const products = [
 
 const itemsBody = (row: any) => (row.category ?? []).join(', ')
 
-function sendRequest(project: string, description: string) {
+function sendRequest(project: string, description: string, dataTypes: string[]) {
 	return fetch('/api/v1/datastreams/requests', {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify({ name: project, description }),
+		body: JSON.stringify({ name: project, description, dataTypes }),
 	})
 }
 
@@ -112,7 +112,11 @@ export default function () {
 						label="Request"
 						disabled={!project || !description}
 						onClick={() =>
-							sendRequest(project, description).then(() => {
+							sendRequest(
+								project,
+								description,
+								selectedProducts.map((e) => e.description)
+							).then(() => {
 								setDescription('')
 								setProject(null)
 								setVisible(false)
