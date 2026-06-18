@@ -19,11 +19,7 @@ export default function TabLayout() {
 			}}
 		>
 			<Tabs.Screen name="index" options={{ title: 'Home', tabBarIcon: ({ color }) => <MaterialIcons color={color} size={28} name="home" /> }} />
-			<Tabs.Screen name="following" options={{ title: 'Following', tabBarIcon: ({ color }) => <MaterialIcons color={color} size={28} name="groups" /> }} />
-			<Tabs.Screen
-				name="reporting"
-				options={{ title: 'Self-Reporting', tabBarIcon: ({ color }) => <MaterialIcons color={color} size={28} name="fact-check" /> }}
-			/>
+			<Tabs.Screen name="projects" options={{ title: 'Projects', tabBarIcon: ({ color }) => <MaterialIcons color={color} size={28} name="fact-check" /> }} />
 		</Tabs>
 	)
 }
